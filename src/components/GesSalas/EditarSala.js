@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { obtenerSalaPorId, actualizarSala } from './api'; // Asegúrate de que la ruta sea correcta
+import { obtenerSalaPorId, actualizarSala } from '../../api/api'; // Asegúrate de que la ruta sea correcta
 
 function EditarSala() {
   const { id } = useParams();
