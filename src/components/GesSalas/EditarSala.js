@@ -4,7 +4,6 @@ import { FaTimes } from 'react-icons/fa'; // Importa el ícono de react-icons
 import axios from 'axios';
 import { fetchSalaFromAPI,updateSalaInAPI } from '../../services/api';
 
-
 function EditarSala() {
   const { id } = useParams();
   const ID_Sala = parseInt(id);
