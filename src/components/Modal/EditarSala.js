@@ -1,11 +1,12 @@
-import { useHistory } from 'react-router-dom';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FaEdit } from 'react-icons/fa';
 
-function GesSalas() {
-  const history = useHistory();
+function GesSalas({ salas }) {
+  const navigate = useNavigate();
 
   const handleEdit = (id) => {
-    history.push(`/editar-sala/${id}`);
+    navigate(`/editar-sala/${id}`);
   };
 
   return (

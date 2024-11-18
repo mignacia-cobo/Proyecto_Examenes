@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { FaEdit } from 'react-icons/fa';
 import * as XLSX from 'xlsx';
 import './GesSalas.css';
+import salaApi from '../../api/salaApi';
+import { fetchSalasConfirmadas, eliminarSalasConfirmadas, guardarSala } from '../../services/api';
 
 function GesSalas() {
   const [salas, setSalas] = useState([]);
@@ -10,15 +12,20 @@ function GesSalas() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const salasGuardadas = localStorage.getItem('salas');
-    if (salasGuardadas) {
-      setSalas(JSON.parse(salasGuardadas));
-    }
+    const getSalasConfirmadas = async () => {
+      try {
+        const result = await fetchSalasConfirmadas();
+        setSalasConfirmadas(result);
+      } catch (error) {
+        console.error('Error al obtener las salas confirmadas:', error);
+      }
+    };
+
+    getSalasConfirmadas();
   }, []);
 
-
-  const handleEdit = (id) => {
-    navigate(`/editar-sala/${id}`);
+  const handleEdit = (ID_Sala) => {
+    navigate(`/editar-sala/${ID_Sala}`);
   };
 
   const handleFileUpload = (e) => {
@@ -29,52 +36,59 @@ function GesSalas() {
     }
 
     const reader = new FileReader();
-    reader.onload = (evt) => {
-      const bstr = evt.target.result;
-      const wb = XLSX.read(bstr, { type: 'binary' });
-      const wsname = wb.SheetNames[0];
-      const ws = wb.Sheets[wsname];
-      const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
+    reader.onload = (event) => {
+      const data = new Uint8Array(event.target.result);
+      const workbook = XLSX.read(data, { type: 'array' });
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+      const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
-      if (data[0].length !== 5) {
+      console.log('Datos leídos del archivo:', jsonData); 
+
+      if (jsonData.length === 0 || Object.keys(jsonData[0]).length !== 5) {
         alert("El archivo no tiene el formato correcto.");
         return;
       }
 
-      const salasCargadas = data.slice(1).map((row) => ({
-        id: row[0],
-        codigo: row[1],
-        nombre: row[2],
-        capacidad: row[3],
-        edificio: row[4]
+      const salasCargadas = jsonData.map((row, index) => ({
+        ID_Sala: index + 1,
+        Codigo_sala: row['codigo_sala'],
+        Nombre_sala: row['nombre_sala'],
+        Capacidad: row['capacidad'],
+        Edificio_ID: row['Edificio'],
+        Estado: true,
       }));
 
       setSalas(salasCargadas);
     };
-    reader.readAsBinaryString(file);
+
+    reader.readAsArrayBuffer(file);
   };
 
-  const confirmarSalas = () => {
-    setSalasConfirmadas(salas);
-    localStorage.setItem('salasConfirmadas', JSON.stringify(salas));
-    localStorage.setItem('salas', JSON.stringify(salas));
-    alert('Salas confirmadas con éxito.');
-  };
-
-  useEffect(() => {
-    const salasGuardadas = localStorage.getItem('salas');//elimine salasConfirmadas prueba
-    if (salasGuardadas) {
-      setSalasConfirmadas(JSON.parse(salasGuardadas));
-      setSalas(JSON.parse(salasGuardadas));
+  const handleConfirmarSalas = async () => {
+    try {
+      const result = await Promise.all(salas.map(async (sala) => {
+        console.log('Enviando sala al backend:', sala); // Log adicional
+        const response = await guardarSala(sala);
+        console.log('Respuesta del backend:', response); // Log adicional
+        return response;
+      }));
+      setSalasConfirmadas(result);
+      alert('Salas confirmadas con éxito.');
+    } catch (error) {
+      console.error('Error al guardar las salas en la base de datos:', error);
     }
-  }, []);
+  };
 
-  const handleRemoveSalasConfirmadas = () => {
-    localStorage.removeItem('salasConfirmadas');
-    localStorage.removeItem('salas');
-    setSalas([]);
-    setSalasConfirmadas([]);
-    alert('Salas eliminadas.');
+  const handleRemoveSalasConfirmadas = async () => {
+    try {
+      await eliminarSalasConfirmadas();
+      setSalas([]);
+      setSalasConfirmadas([]);
+      alert('Salas eliminadas.');
+    } catch (error) {
+      console.error('Error al eliminar las salas confirmadas de la base de datos:', error);
+    }
   };
 
   return (
@@ -83,33 +97,29 @@ function GesSalas() {
       <input type="file" onChange={handleFileUpload} accept=".xls, .xlsx" />
       {salas.length > 0 && (
         <>
+        <div className="table-container">
           <table>
             <thead>
               <tr>
-                <th>ID</th>
                 <th>Código</th>
                 <th>Nombre</th>
                 <th>Capacidad</th>
                 <th>Edificio</th>
-                <th>Editar</th> {/* Nueva columna */}
               </tr>
             </thead>
             <tbody>
               {salas.map((sala) => (
-                <tr key={sala.id}>
-                  <td>{sala.id}</td>
-                  <td>{sala.codigo}</td>
-                  <td>{sala.nombre}</td>
-                  <td>{sala.capacidad}</td>
-                  <td>{sala.edificio}</td>
-                  <td>
-                    <FaEdit onClick={() => handleEdit(sala.id)} style={{ cursor: 'pointer' }} />
-                  </td> {/* Ícono de edición */}
+                <tr key={sala.ID_Sala}>
+                  <td>{sala.Codigo_sala}</td>
+                  <td>{sala.Nombre_sala}</td>
+                  <td>{sala.Capacidad}</td>
+                  <td>{sala.Edificio_ID}</td>
                 </tr>
               ))}
             </tbody>
           </table>
-          <button onClick={confirmarSalas}>Confirmar Salas</button>
+          </div>
+          <button onClick={handleConfirmarSalas}>Confirmar Salas</button>
         </>
       )}
 
@@ -119,21 +129,23 @@ function GesSalas() {
           <table>
             <thead>
               <tr>
-                <th>ID</th>
                 <th>Código</th>
                 <th>Nombre Sala</th>
                 <th>Capacidad</th>
                 <th>Edificio</th>
+                <th>Editar</th>
               </tr>
             </thead>
             <tbody>
               {salasConfirmadas.map((sala) => (
-                <tr key={sala.id}>
-                  <td>{sala.id}</td>
-                  <td>{sala.codigo}</td>
-                  <td>{sala.nombre}</td>
-                  <td>{sala.capacidad}</td>
-                  <td>{sala.edificio}</td>
+                <tr key={sala.ID_Sala}>
+                  <td>{sala.Codigo_sala}</td>
+                  <td>{sala.Nombre_sala}</td>
+                  <td>{sala.Capacidad}</td>
+                  <td>{sala.Edificio_ID}</td>
+                  <td>
+                    <FaEdit onClick={() => handleEdit(sala.ID_Sala)} style={{ cursor: 'pointer' }} />
+                  </td>
                 </tr>
               ))}
             </tbody>

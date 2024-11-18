@@ -1,60 +1,76 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { obtenerSalaPorId, actualizarSala } from '../../api/api'; // Asegúrate de que la ruta sea correcta
+import { FaTimes } from 'react-icons/fa'; // Importa el ícono de react-icons
+import axios from 'axios';
+import { fetchSalaFromAPI,updateSalaInAPI } from '../../services/api';
 
 function EditarSala() {
   const { id } = useParams();
+  const ID_Sala = parseInt(id);
   const navigate = useNavigate();
   const [sala, setSala] = useState({
-    codigo: '',
-    nombre: '',
-    capacidad: '',
-    edificio: ''
+    ID_Sala: '',
+    Codigo_sala: '',
+    Nombre_sala: '',
+    Capacidad: '',
+    Edificio_ID: '',
+    Estado: true,
   });
-
   useEffect(() => {
-    const fetchSala = async () => {
-      const salaData = await obtenerSalaPorId(id);
-      console.log('Datos de la sala obtenidos:', salaData); 
-      setSala(salaData);
+    const getSala = async () => {
+      try {
+        const response = await fetchSalaFromAPI(ID_Sala);
+        setSala(response);
+        console.log('datos de la sala',response);
+      } catch (error) {
+        console.error('Error al obtener los datos de la sala aqui:', error);
+        
+      }
     };
-    fetchSala();
-  }, [id]);
+    getSala();
+  }, [ID_Sala]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await actualizarSala(id, sala);
-    navigate('/GesSalas'); 
+    try {
+      await updateSalaInAPI(ID_Sala, sala);
+      navigate('/GesSalas');
+    } catch (error) {
+      console.error('Error al actualizar la sala:', error);
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input
-        type="text"
-        value={sala.codigo}
-        onChange={(e) => setSala({ ...sala, codigo: e.target.value })}
-        placeholder="Código"
-      />
-      <input
-        type="text"
-        value={sala.nombre}
-        onChange={(e) => setSala({ ...sala, nombre: e.target.value })}
-        placeholder="Nombre"
-      />
-      <input
-        type="number"
-        value={sala.capacidad}
-        onChange={(e) => setSala({ ...sala, capacidad: e.target.value })}
-        placeholder="Capacidad"
-      />
-      <input
-        type="text"
-        value={sala.edificio}
-        onChange={(e) => setSala({ ...sala, edificio: e.target.value })}
-        placeholder="Edificio"
-      />
-      <button type="submit">Actualizar Sala</button>
-    </form>
+    <div class="content-container-editar">
+      <FaTimes className="exit-icon" onClick={() => navigate('/GesSalas')} /> {/* Ícono de salida */}
+      <form className="editar-sala-form" onSubmit={handleSubmit}>
+        <input
+          type="text"
+          value={sala.Codigo_sala}
+          onChange={(e) => setSala({ ...sala, Codigo_sala: e.target.value })}
+          placeholder="Código"
+        />
+        <input
+          type="text"
+          value={sala.Nombre_sala}
+          onChange={(e) => setSala({ ...sala, Nombre_sala: e.target.value })}
+          placeholder="Nombre"
+        />
+        <input
+          type="number"
+          value={sala.Capacidad}
+          onChange={(e) => setSala({ ...sala, Capacidad: e.target.value })}
+          placeholder="Capacidad"
+        />
+        <input
+          type="text"
+          value={sala.Edificio_ID}
+          onChange={(e) => setSala({ ...sala, Edificio_ID: e.target.value })}
+          placeholder="Edificio"
+        />
+        <button type="submit">Actualizar Sala</button>
+      </form>
+    </div>
   );
 }
 
