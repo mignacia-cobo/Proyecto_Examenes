@@ -54,3 +54,15 @@ export const updateSalaInAPI = async (ID_Sala, salaData) => {
     throw error;
   }
 };
+
+// ELIMINAR SALA
+export const deleteSalaInAPI = async (ID_Sala) => {
+  try {
+    const response = await axios.delete(`${API_URL}/eliminarSala/${ID_Sala}`);
+    console.log('Response:', response.data);
+    return response.data;
+  } catch (error) {
+      console.error('Error al eliminar la sala API:', error.message);
+    throw error;
+  }
+};

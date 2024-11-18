@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaEdit } from 'react-icons/fa';
+import { FaEdit,FaTrash } from 'react-icons/fa';
 import * as XLSX from 'xlsx';
 import './GesSalas.css';
 import salaApi from '../../api/salaApi';
-import { fetchSalasConfirmadas, eliminarSalasConfirmadas, guardarSala } from '../../services/api';
+import { fetchSalasConfirmadas, guardarSala,deleteSalaInAPI } from '../../services/api';
 
 function GesSalas() {
   const [salas, setSalas] = useState([]);
   const [salasConfirmadas, setSalasConfirmadas] = useState([]);
   const navigate = useNavigate();
 
+  //SE OBTIENEN LAS SALAS REGISTRADAS EN LA BASE DE DATOS
   useEffect(() => {
     const getSalasConfirmadas = async () => {
       try {
@@ -24,10 +25,12 @@ function GesSalas() {
     getSalasConfirmadas();
   }, []);
 
+  //EDITAR SALA- SE ABRE VENTANA PARA EDITAR SALA
   const handleEdit = (ID_Sala) => {
     navigate(`/editar-sala/${ID_Sala}`);
   };
 
+  //SUBIR ARCHIVO DE EXCEL, SE PREVISUALIZAN LAS SALAS ANTES DE GUARDARLAS
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
     if (!file) {
@@ -65,6 +68,7 @@ function GesSalas() {
     reader.readAsArrayBuffer(file);
   };
 
+  //GUARDA LAS SALAS QUE SE CARGARON EN EL ARCHIVO EN LA BASE DE DATOS
   const handleConfirmarSalas = async () => {
     try {
       const result = await Promise.all(salas.map(async (sala) => {
@@ -80,11 +84,12 @@ function GesSalas() {
     }
   };
 
-  const handleRemoveSalasConfirmadas = async () => {
+  //ELIMINA UNA SALA DE LA BASE DE DATOS, SE PASA EL ID CUANDO SE LLAMA AL METODO, EL ID SE OBTIENE DE LA FILA DE LA TABLA DE SALAS CONFIRMADAS
+  const handleRemoveSalasConfirmadas = async (ID_Sala) => {
     try {
-      await eliminarSalasConfirmadas();
-      setSalas([]);
-      setSalasConfirmadas([]);
+      const response = await deleteSalaInAPI(ID_Sala);
+      console.log('Sala eliminada ID_Sala:', ID_Sala, response);
+      setSalasConfirmadas(prevSalasConfirmadas => prevSalasConfirmadas.filter(sala => sala.ID_Sala !== ID_Sala));
       alert('Salas eliminadas.');
     } catch (error) {
       console.error('Error al eliminar las salas confirmadas de la base de datos:', error);
@@ -145,6 +150,7 @@ function GesSalas() {
                   <td>{sala.Edificio_ID}</td>
                   <td>
                     <FaEdit onClick={() => handleEdit(sala.ID_Sala)} style={{ cursor: 'pointer' }} />
+                    <FaTrash onClick={() => handleRemoveSalasConfirmadas(sala.ID_Sala)} style={{ cursor: 'pointer' }} />
                   </td>
                 </tr>
               ))}
