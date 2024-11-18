@@ -46,6 +46,7 @@ const obtenerSalasConfirmadas = async (req, res) => {
   }
 };
 
+// Guardar una sala
 const guardarSala = async (req, res) => {
   const salaData = req.body;
   console.log('Datos recibidos en el controlador:', salaData);
@@ -58,10 +59,24 @@ const guardarSala = async (req, res) => {
   }
 };
 
+//Eliminar sala por ID
+const handleEliminarSalaID = async (req, res) => {
+  const id = req.params.id;
+  console.log('ID de la sala a eliminar controller1:', id);
+  try {
+    const salaEliminada = await salaService.eliminarSalaPorID(id);
+    console.log('Sala eliminada resultado :', salaEliminada);
+    res.status(200).json({ message: 'Sala eliminada exitosamente' });
+  } catch (error) {
+    console.error('Error al eliminar la sala:', error);
+    res.status(500).json({ error: 'Error al eliminar la sala' });
+  }
+};
 
 module.exports = {
   obtenerSalaPorId,
   actualizarSala,
   obtenerSalasConfirmadas,
   guardarSala,
+  handleEliminarSalaID,
 };

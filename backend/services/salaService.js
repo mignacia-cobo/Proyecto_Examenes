@@ -16,6 +16,7 @@ const obtenerSalaPorId = async (id) => {
 const actualizarSala = async (id, salaActualizada) => {
   try {
     const sala = await Sala.findByPk(id);
+    console.log('Sala:', sala);
     if (!sala) {
       throw new Error('Sala no encontrada');
     }
@@ -44,9 +45,19 @@ const guardarSala = async (salaData) => {
   }
 };
 
+const eliminarSalaPorID = async (ID_Sala) => {
+  try {
+      const result = await Sala.destroy({ where: { ID_Sala } });
+      return result;
+  } catch (error) {
+      throw new Error('Error al eliminar la sala');
+  }
+};
+
 module.exports = {
   obtenerSalaPorId,
   actualizarSala,
   obtenerSalasConfirmadas,
   guardarSala,
+  eliminarSalaPorID,
 };

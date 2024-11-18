@@ -4,7 +4,9 @@ import { FaTimes } from 'react-icons/fa'; // Importa el ícono de react-icons
 import axios from 'axios';
 import { fetchSalaFromAPI,updateSalaInAPI } from '../../services/api';
 
+
 function EditarSala() {
+
   const { id } = useParams();
   const ID_Sala = parseInt(id);
   const navigate = useNavigate();
@@ -16,6 +18,8 @@ function EditarSala() {
     Edificio_ID: '',
     Estado: true,
   });
+
+  //SE OBTIENE LA SALA A EDITAR PARA MOSTRARLA EN EL FORMULARIO
   useEffect(() => {
     const getSala = async () => {
       try {
@@ -30,6 +34,8 @@ function EditarSala() {
     getSala();
   }, [ID_Sala]);
 
+
+  //ACTUALIZAR SALA
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
