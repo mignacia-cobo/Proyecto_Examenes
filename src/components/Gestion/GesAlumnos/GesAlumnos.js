@@ -57,8 +57,10 @@ function GesAlumnos() {
 
 
     return (
+      <>
+      <p class="titulo">Gestión de Alumnos</p>
       <div className='carga-masiva-container'>
-            <h1>Carga Masiva de Alumnos</h1>
+            
             <button onClick={handleRemoveAlumnosConfirmados} className="btn">
                 <img className="imagen-boton" src="eliminar.png" alt="Eliminar" />
             </button>
@@ -127,6 +129,7 @@ function GesAlumnos() {
                 </>
             )}
         </div>
+        </>
     );
 }
 

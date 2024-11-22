@@ -59,6 +59,8 @@ function GesExamen() {
         };
     
         return (
+            <>
+            <p class="titulo">Gestión de Exámenes</p>
             <div className='carga-masiva-container'>
                 <h1>Carga Masiva de Exámenes</h1>
                 <button onClick={handleRemoveExamenesConfirmados} className="btn">
@@ -127,6 +129,7 @@ function GesExamen() {
                     </>
                 )}
             </div>
+            </>
         );
     }
 

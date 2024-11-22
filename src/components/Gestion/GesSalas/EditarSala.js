@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FaTimes } from 'react-icons/fa'; // Importa el ícono de react-icons
-import axios from 'axios';
-import { fetchSalaFromAPI,updateSalaInAPI } from '../../services/api';
+import { fetchSalaFromAPI,updateSalaInAPI } from '../../../services/api';
 
 
 function EditarSala() {
@@ -23,7 +22,7 @@ function EditarSala() {
   useEffect(() => {
     const getSala = async () => {
       try {
-        const response = await fetchSalaFromAPI(ID_Sala);
+        const response = await fetchSalaFromAPI(id);
         setSala(response);
         console.log('datos de la sala',response);
       } catch (error) {
@@ -32,7 +31,7 @@ function EditarSala() {
       }
     };
     getSala();
-  }, [ID_Sala]);
+  }, [id]);
 
 
   //ACTUALIZAR SALA
@@ -40,7 +39,7 @@ function EditarSala() {
     e.preventDefault();
     try {
       await updateSalaInAPI(ID_Sala, sala);
-      navigate('/GesSalas');
+      navigate('/Gestion/Salas');
     } catch (error) {
       console.error('Error al actualizar la sala:', error);
     }
@@ -48,7 +47,7 @@ function EditarSala() {
 
   return (
     <div class="content-container-editar">
-      <FaTimes className="exit-icon" onClick={() => navigate('/GesSalas')} /> {/* Ícono de salida */}
+      <FaTimes className="exit-icon" onClick={() => navigate('/Gestion/Salas')} /> {/* Ícono de salida */}
       <form className="editar-sala-form" onSubmit={handleSubmit}>
         <input
           type="text"

@@ -76,6 +76,7 @@ function VerDisponibilidadSalas() {
 
     return (
       <>
+      <p className="titulo-disp-salas">Disponibilidad de Salas</p>
         {rangosHorarios.map((horario, indexModulo) => (
           <tr key={indexModulo}>
             <td>{indexModulo + 1}</td>
@@ -112,8 +113,8 @@ function VerDisponibilidadSalas() {
 
   return (
     <>
-      <p className="titulo-disp-salas">Disponibilidad de Salas</p>
-      <div className='disp-salas-container' style={{ marginTop: '45px' }}>
+      <p className="titulo">Disponibilidad de Salas</p>
+      <div className='container-lateral'>
         <div className="search-section">
           <h2>Seleccionar Sala</h2>
           <div className="search-box">
@@ -171,23 +172,23 @@ function VerDisponibilidadSalas() {
             </div>
           </div>  
         </div>
-        
-        <div className="details-section" style={{ marginTop: '3px' }}>
-          {salaSeleccionada && (
-            <table>
-              <thead>
-                <tr>
-                  <th colSpan={8}>{`Sala ${salaSeleccionada.codigo} - ${salaSeleccionada.nombre} (${salaSeleccionada.capacidad}) - ${salaSeleccionada.edificio}`}</th>
-                </tr>
-                {renderCabeceraTabla()}
-              </thead>
-              <tbody>
-                {renderFilasTabla()}
-              </tbody>
-            </table>
-          )}
-        </div> 
       </div>
+        
+      <div className="details-section" style={{ marginTop: '3px' }}>
+        {salaSeleccionada && (
+          <table>
+            <thead>
+              <tr>
+                <th colSpan={8}>{`Sala ${salaSeleccionada.codigo} - ${salaSeleccionada.nombre} (${salaSeleccionada.capacidad}) - ${salaSeleccionada.edificio}`}</th>
+              </tr>
+              {renderCabeceraTabla()}
+            </thead>
+            <tbody>
+              {renderFilasTabla()}
+            </tbody>
+          </table>
+        )}
+      </div> 
     </>
   );
 }

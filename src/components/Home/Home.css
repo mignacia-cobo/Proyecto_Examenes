@@ -1,13 +1,7 @@
 .home-form {
-  font-family: 'Arial', sans-serif; /* Letra */
-  font-size: 12px; /* Tamaño de la letra */
-  background-color: #fff;
-  padding: 200px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  max-width: 800px;
-  margin: 100px auto;
-  text-align: center;
+  background: #fff;
+  width: 100%;
+  align-content: center;
 }
 
 .image-container {
