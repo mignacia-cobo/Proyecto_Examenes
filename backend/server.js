@@ -1,8 +1,9 @@
 const express = require('express');
 const cors = require('cors'); // Importa el paquete cors
 const {conectarDB} = require('./database');
-const salaRoutes = require('./routes/salaRoutes');
+const Routes = require('./routes/Routes');
 const Sala = require('./models/Sala');
+const Modulo = require('./models/Modulo');
 
 const app = express();
 const port = 3000;
@@ -15,9 +16,11 @@ conectarDB();
 
 // Sincronizar modelos
 Sala.sync();
+Modulo.sync();
 
 // Usar las rutas de sala
-app.use('/api/salas', salaRoutes);
+app.use('/api', Routes);
+//app.use('/api/modulos', Routes);
 
 // Middleware de manejo de errores
 app.use((err, req, res, next) => {

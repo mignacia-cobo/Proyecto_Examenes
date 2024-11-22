@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Link, Routes } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { GiHamburgerMenu } from "react-icons/gi";
 import './SlideMenu.css';
 
 const SlideMenu = ({ isExpanded, onToggleMenu }) => {
@@ -13,25 +14,35 @@ const SlideMenu = ({ isExpanded, onToggleMenu }) => {
     <div className='slide-container'>
       <div className={`side-menu ${isExpanded ? 'expanded' : 'collapsed'}`}>
         <button onClick={onToggleMenu} className="toggle-menu-btn">
-          Menu
+        <GiHamburgerMenu />
         </button>
 
       {isExpanded && (
+        
         <nav>
           <ul>
             <li><Link to="/">Inicio</Link></li>
-            <li><Link to="/DispSalas">Disponibilidad de Salas</Link></li>
-            <li><Link to="/VerDispSalas">Disponibilidad de Salas 2.0</Link></li>
-            <li><Link to="/PlaExamen">Planificación de Exámenes</Link></li>
-            <li><Link to="/GesSalas">Gestión de Salas</Link></li>
-            <li><Link to="/GesExamen">Gestión de Exámenes</Link></li>
-            <li><Link to="/GesAlumnos">Carga Masiva de Alumnos</Link></li>
+            <li><Link to="/Planificacion">Planificación de Exámenes</Link></li>
+            <li><Link to="/Disponibilidad">Disponibilidad de Salas</Link></li>
+            <li><Link to="/DisponibilidadSalas">Disponibilidad de Salas 2.0</Link></li>
+            
             <div className="menu-item">
-              <span onClick={toggleReportMenu}>Reportes</span>
+              <span onClick={toggleReportMenu}>GESTIÓN</span>
               {isReportMenuOpen && (
                 <div className="submenu">
-                  <li><Link to="/Reportes/ReportesAlumno" >Reportes Alumnos</Link></li>
-                  <li><Link to="/Reportes/ReportesDocente" >Reportes Docente</Link></li>
+                  <li><Link to="/Gestion/Salas">Salas</Link></li>
+                  <li><Link to="/Gestion/Modulos">Modulos</Link></li>
+                  <li><Link to="/GestionExamenes">Exámenes</Link></li>
+                  <li><Link to="/Gestion/Alumnos">Alumnos</Link></li>
+                </div>
+              )}
+            </div>
+            <div className="menu-item">
+              <span onClick={toggleReportMenu}>REPORTES</span>
+              {isReportMenuOpen && (
+                <div className="submenu">
+                  <li><Link to="/Reportes/ReportesAlumno" >Alumnos</Link></li>
+                  <li><Link to="/Reportes/ReportesDocente">Docente</Link></li>
                 </div>
               )}
             </div>
@@ -39,6 +50,7 @@ const SlideMenu = ({ isExpanded, onToggleMenu }) => {
             {/* otros elementos del menú */}
           </ul>
         </nav>
+        
       )}
     </div>
   

@@ -64,6 +64,9 @@ function ReportesAlumno() {
   }, [filtroAlumno, reservas, alumnos]);
 
   return (
+    <>
+    <p class="titulo">Reportes de Alumnos</p>
+    
     <div className="reportes-container">
       <h2>Exámenes Reservados por Alumno</h2>
       <input
@@ -101,6 +104,7 @@ function ReportesAlumno() {
         </tbody>
       </table>
     </div>
+    </>
   );
 }
 

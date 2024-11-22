@@ -19,14 +19,14 @@ const Sala = sequelize.define('Sala', {
     type: DataTypes.INTEGER
   },
   Edificio_ID: {
-    type: DataTypes.INTEGER
+    type: DataTypes.STRING
   },
   Estado: {
     type: DataTypes.BOOLEAN
   }
 }, {
-  tableName: 'Salas',
-  timestamps: false // Si no tienes columnas de timestamps en tu tabla
+  tableName: 'Sala',
+  timestamps: true // Si no tienes columnas de timestamps en tu tabla
 });
 
 // Sincronizar el modelo con la base de datos

@@ -608,10 +608,10 @@ useEffect(() => {
 
       
      
-    return (
-      <>
-        <p className="titulo-disp-salas">Planificación de Examenes</p>
-        <div className='disp-salas-container' style={{ marginTop: '45px' }}>
+  return (
+    <>
+      <p className="titulo">Planificación de Examenes</p>
+      <div className='container-lateral'>
         <div className="search-section">
           <h2>Buscar Examen</h2>
           <div className="search-box">
@@ -622,108 +622,105 @@ useEffect(() => {
             {/* <input type="text" value={docenteSeleccionado} onChange={handleDocenteChange} placeholder="Docente" /> */}
             <button onClick={handleSearch}>Buscar</button>
             <div className="search-box-table">
-            <table>
-              <thead>
-                <tr>
-                  <th>Evento</th>
-                  <th>Sección</th>
-                  <th>Asignatura</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {searchResultExam.map((exam, index) => (
-                  <tr key={index}>
-                    <td>{exam.evento}</td>
-                    <td>{exam.seccion}</td>
-                    <td>{exam.asignatura}</td>
-                    <td>
-                    {exam.reservado ? (
-                      <Tooltip className="contennido" content={`RESERVADO`}>
-                        <button onClick={() => handleSelectExam(exam)} className={`imagenb ${selectedExam === exam ? 'imagen-seleccionada' : ''}`}>
-                          <img className="imagen-boton-no" src="sel.png" alt="Seleccionar" />
-                        </button>
-                      </Tooltip>
-                    ) : (
-                      <button onClick={() => handleSelectExam(exam)} className={`imagenb ${selectedExam === exam ? 'imagen-seleccionada' : ''}`}>
-                        <img className="imagen-boton" src="sel.png" alt="Seleccionar" />
-                      </button>
-                    )}
-                    </td>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Evento</th>
+                    <th>Sección</th>
+                    <th>Asignatura</th>
+                    <th></th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {searchResultExam.map((exam, index) => (
+                    <tr key={index}>
+                      <td>{exam.evento}</td>
+                      <td>{exam.seccion}</td>
+                      <td>{exam.asignatura}</td>
+                      <td>
+                      {exam.reservado ? (
+                        <Tooltip className="contennido" content={`RESERVADO`}>
+                          <button onClick={() => handleSelectExam(exam)} className={`imagenb ${selectedExam === exam ? 'imagen-seleccionada' : ''}`}>
+                            <img className="imagen-boton-no" src="sel.png" alt="Seleccionar" />
+                          </button>
+                        </Tooltip>
+                      ) : (
+                        <button onClick={() => handleSelectExam(exam)} className={`imagenb ${selectedExam === exam ? 'imagen-seleccionada' : ''}`}>
+                          <img className="imagen-boton" src="sel.png" alt="Seleccionar" />
+                        </button>
+                      )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>  
-             <h2>Buscar Salas</h2>
-            <div className="search-box">
-   
-              <input type="date" value={format(fechaSeleccionada, 'yyyy-MM-dd')} onChange={(e) => setFechaSeleccionada(new Date(e.target.value))} />
-              <br />
-              <input type="text" placeholder="Edificio" value={edificioBusqueda} onChange={(e) => setEdificioBusqueda(e.target.value)} />
-              <br />
-              <input type="text" placeholder="Nombre" value={nombreSalaBusqueda} onChange={(e) => setNombreSalaBusqueda(e.target.value)} />
-              <br />
-              <input type="text" placeholder="cod. Sala" value={codigoSalaBusqueda} onChange={(e) => setCodigoSalaBusqueda(e.target.value)} />
-   
-              <button onClick={handleSearchSala}>Buscar</button>
+          <h2>Buscar Salas</h2>
+          <div className="search-box">
+            <input type="date" value={format(fechaSeleccionada, 'yyyy-MM-dd')} onChange={(e) => setFechaSeleccionada(new Date(e.target.value))} />
+            <br />
+            <input type="text" placeholder="Edificio" value={edificioBusqueda} onChange={(e) => setEdificioBusqueda(e.target.value)} />
+            <br />
+            <input type="text" placeholder="Nombre" value={nombreSalaBusqueda} onChange={(e) => setNombreSalaBusqueda(e.target.value)} />
+            <br />
+            <input type="text" placeholder="cod. Sala" value={codigoSalaBusqueda} onChange={(e) => setCodigoSalaBusqueda(e.target.value)} />
+            <button onClick={handleSearchSala}>Buscar</button>
             <div className="search-box-table">
-            <table>
-              <thead>
-                <tr>
-                  <th>cod. Sala</th>
-                  <th>Nombre</th>
-                  <th>-</th>
-                </tr>
-              </thead>
-              <tbody>
-                {searchResultSala.map((salas, index) => (
-                  <tr key={index}>
-                    <td>{salas.codigo}</td>
-                    <td>{salas.nombre}</td>
-                    <td>
-                      <button onClick={() => handleSelectSala(salas)} className={`imagenb ${selectedSala === salas ? 'imagen-seleccionada' : ''}`}>
-                        <img className="imagen-boton" src="sel.png" alt="Seleccionar" />
-                      </button>
-                    </td>
+              <table>
+                <thead>
+                  <tr>
+                    <th>cod. Sala</th>
+                    <th>Nombre</th>
+                    <th>-</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {searchResultSala.map((salas, index) => (
+                    <tr key={index}>
+                      <td>{salas.codigo}</td>
+                      <td>{salas.nombre}</td>
+                      <td>
+                        <button onClick={() => handleSelectSala(salas)} className={`imagenb ${selectedSala === salas ? 'imagen-seleccionada' : ''}`}>
+                          <img className="imagen-boton" src="sel.png" alt="Seleccionar" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
-        
-        {/* Renderizar la tabla solo si hay una sala seleccionada */}
-        <div>
-        {salaSeleccionada ? (
-          <div className="details-section" style={{ marginTop: '3px' }}>
+      </div>
+      {/* Renderizar la tabla solo si hay una sala seleccionada */}
+      
+      {/*<div className="details-section">*/}
+      {salaSeleccionada ? (
+        <div className="details-section">
+          <div className='details-section-table'>
             {/*<h2>Módulos de la Sala: {salaSeleccionada.nombre}</h2>*/}
-            <table /*className="table-container-right"*/>
+            <table>
             <thead>
-              
               <tr>
                 <th colSpan="9">Sala {salaSeleccionada.codigo} - {salaSeleccionada.nombre} - {salaSeleccionada.capacidad}</th>
               </tr>
               {renderCabeceraTabla()}
-                
             </thead>
               <tbody>{renderFilasTabla()}</tbody>
             </table>
-            <div className='div-centrado'>       
-            <button onClick={reservarModulos}>Confirmar Reserva</button>
-            </div>
           </div>
-        ) : ( 
-          <p>No hay ninguna sala seleccionada</p>
-        )}
-        </div> 
-        
-      </div>
-      </>
-      );
-    }
+          <div className='div-centrado'>       
+            <button onClick={reservarModulos}>Confirmar Reserva</button>
+          </div>
+        </div>
+      ) : ( 
+        <p>No hay ninguna sala seleccionada</p>
+      )}
+      {/*</div>*/}
+    </>
+    );
+  }
         
 
 export default PlaExamen;

@@ -276,9 +276,9 @@ useEffect(() => {
   return (
        
     <>
-      <p className="titulo-disp-salas">Disponibilidad de Salas</p>
+      <p className="titulo">Disponibilidad de Salas</p>
         {/*  la sección de búsqueda */}
-      <div className='disp-salas-container' style={{ marginTop: '45px' }}>
+      <div className='container-lateral'>
       <div className="search-section">
         <h2>Buscar Salas</h2>
         <div className="search-box">
