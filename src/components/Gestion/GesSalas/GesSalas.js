@@ -3,19 +3,39 @@ import { useNavigate } from 'react-router-dom';
 import { FaEdit,FaTrash } from 'react-icons/fa';
 import * as XLSX from 'xlsx';
 import './GesSalas.css';
-import { fetchSalasConfirmadas, guardarSala,deleteSalaInAPI } from '../../../services/api';
+import { fetchSalasConfirmadas, guardarSala,deleteSalaInAPI, fetchEdicicio } from '../../../services/api';
 
 function GesSalas() {
   const [salas, setSalas] = useState([]);
   const [salasConfirmadas, setSalasConfirmadas] = useState([]);
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
+  const [edificios, setEdificios] = useState([]);
   const [newSala, setNewSala]  = useState({    
     Codigo_sala: '',
     Nombre_sala: '',
     Capacidad: '',
     Edificio_ID: '',
   });
+
+  //OBTENER EDIFICIOS
+  useEffect(() => {
+    // Obtener los datos desde el servidor
+    const getEdificios = async () => {
+      try {
+        const result = await fetchEdicicio();
+        console.log(result);
+        setEdificios(result);
+      } catch (error) {
+        console.error('Error al obtener las salas:', error);
+      }
+    };
+    getEdificios();
+  }, []);
+  // Manejar el cambio de selección del edificio
+  const handleEdificioChange = (event) => {
+    setNewSala({ ...newSala, Edificio_ID: event.target.value });
+  };
 
   //SE OBTIENEN LAS SALAS REGISTRADAS EN LA BASE DE DATOS
   useEffect(() => {
@@ -156,6 +176,17 @@ function GesSalas() {
               value={newSala.Capacidad}
               onChange={(e) => setNewSala({ ...newSala, Capacidad: e.target.value })}
             />
+            <select
+              value={newSala.Edificio_ID}
+              placeholder='Edificio'
+              onChange={handleEdificioChange}>
+              <option value="">Seleccione un edificio</option>
+                {edificios.map(edificio => (
+                  <option key={edificio.id} value={edificio.id}>
+                    {edificio.Nombre_Edificio}
+                  </option>
+          ))}
+            </select>
             <input
               type='text'
               placeholder='ID de Edificio'

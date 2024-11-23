@@ -39,21 +39,6 @@ function DispSalas() {
     setSemana(semanaActual => Math.max(17, Math.min(18, semanaActual + incremento)));
   };
 
- 
-
-  {/* Datos simulados para la disponibilidad de la sala
-  const disponibilidadSala = {
-    //estructura de ejemplo para la disponibilidad
-    Lunes: [{ seccion: 'MDY2131-001D', asignatura: 'CONSULTAS DE BASES DE DATOS', docente: 'PATRICIA ANDREA' }, ,
-    Martes: [{ seccion: 'PRY2111-004D', asignatura: 'DISEÑO DE PROTOTIPOS', docente: 'BRYAN VICENTE' }, ],
-    Miercoles:[{ seccion: 'MDY2131-001D', asignatura: 'CONSULTAS DE BASES DE DATOS', docente: 'PATRICIA ANDREA' }, ],
-    Jueves:[{ seccion: 'PGY2121-001D', asignatura: 'DESARROLLO DE SOFTWARE DE E', docente: 'MARIA IGNACIA' }, ],
-    Viernes:[{ seccion: 'PTK4316-001D', asignatura: 'PORTAFOLIO DE TITULO', docente: 'JUAN NESTOR' },],
-    Sábado:[{ seccion: 'PRY2111-004D', asignatura: 'DISEÑO DE PROTOTIPOS', docente: 'PATRICIA ANDREA' }, ],
-    // no se agrega domingo 
-  }; */}
-
-
 // Estructura inicial para un día
 const initialDayStructure = Array(20).fill(null).map((_, index) => ({
   numero: index + 1,
@@ -113,8 +98,6 @@ useEffect(() => {
     '08:01 - 08:40', '08:41 - 09:20', '09:31 - 10:10', '10:11 - 10:50', '11:01 - 11:40', '11:41 - 12:20', '12:31 - 13:10', '13:11 - 13:50', '14:01 - 14:40', '14:41 - 15:20', '15:31 - 16:10', '16:11 - 16:50', '17:01 - 17:40', '17:41 - 18:20', '18:21 - 19:00', '19:11 - 19:50', '19:51 - 20:30', '20:41 - 21:20', '21:21 - 22:00', '22:10 - 22:50', // ... completar para todos los módulos
   ];
 
-  
-
   const renderInfoModulo = (modulo) => {
     if (!modulo) return <td style={{ border: '1px solid #fff'}}>-</td>;
     return (
@@ -125,22 +108,6 @@ useEffect(() => {
       </td>
     );
   };
-
-  /*const renderModulos = () => {
-    return rangosHorarios.map((rango, index) => (
-      <tr key={index}>
-        <td>{index + 1}</td>
-        <td>{rango}</td>
-        <td>{renderInfoModulo(disponibilidadSala.Lunes[index])}</td>
-        <td>{renderInfoModulo(disponibilidadSala.Martes[index])}</td>
-        <td>{renderInfoModulo(disponibilidadSala.Miercoles[index])}</td>
-        <td>{renderInfoModulo(disponibilidadSala.Jueves[index])}</td>
-        <td>{renderInfoModulo(disponibilidadSala.Viernes[index])}</td>
-        <td>{renderInfoModulo(disponibilidadSala.Sábado[index])}</td>
-        
-      </tr>
-    ));
-  };*/
 
   const renderModulos = () => {
     return rangosHorarios.map((rango, index) => (
@@ -209,38 +176,19 @@ useEffect(() => {
     
     }
   }, []);
-  //fin para buscar salas desde localStorage
-
-  {/* useEffect(() => {
-    const reservasGuardadas = localStorage.getItem('reservas');
-    if (reservasGuardadas) {
-        setReservas(JSON.parse(reservasGuardadas));
-    }
-}, []); */}
+ 
 
   const renderDetalleSala = () => {
     if (!selectedSala) return <p>Seleccione una sala para ver detalles.</p>;
-
-    
-
     return (
-      <div>  
-        {/* selector de semestre y semana */}
-        <div className="search-box">
-          {/*<label>Semestre: </label>
-          <select value={semestre} onChange={(e) => setSemestre(e.target.value)}>
-            <option value="2023-01">2023-01</option>
-            <option value="2024-01">2024-01</option>
-            <option value="2024-02">2024-02</option>
-          </select>*/}
-          
+      <div className="details-section-table" ref={tableRef}>
+        <div className='details-section-content'>      
+          {/* selector de semestre y semana */}
           <label>Semana: </label>
           <button onClick={() => cambiarSemana(-1)}>-</button>
           <span>{semana}</span>
           <button onClick={() => cambiarSemana(1)}>+</button>
         </div>
-        
-        <div ref={tableRef}>
         <table id="tabla">
           <thead>
             {/* cabecera de la tabla */}
@@ -261,17 +209,14 @@ useEffect(() => {
             {renderModulos()}
           </tbody>
         </table>
-        </div>
-        <div className='div-centrado'>
-        <button onClick={generarPDF}>Generar PDF</button>
-        <button onClick={exportTableToExcel}>Exportar a Excel</button>
+        <div className='details-section-content'>
+          {/* botones para exportar a PDF y Excel */}
+          <button onClick={generarPDF}>Generar PDF</button>
+          <button onClick={exportTableToExcel}>Exportar a Excel</button>
         </div>
       </div>
     );
   };
-
-  
-
 
   return (
        
@@ -279,52 +224,48 @@ useEffect(() => {
       <p className="titulo">Disponibilidad de Salas</p>
         {/*  la sección de búsqueda */}
       <div className='container-lateral'>
-      <div className="search-section">
-        <h2>Buscar Salas</h2>
-        <div className="search-box">
-          <input type="text" placeholder="Edificio" value={edificioBusqueda} onChange={(e) => setEdificioBusqueda(e.target.value)}/>
-          <br />
-          <input type="text" placeholder="Nombre" value={nombreSalaBusqueda} onChange={(e) => setNombreSalaBusqueda(e.target.value)}/>
-          <br />
-          <input type="text" placeholder="cod. Sala" value={codigoSalaBusqueda} onChange={(e) => setCodigoSalaBusqueda(e.target.value)} />
+        <div className="search-section">
+          <h2>Buscar Salas</h2>
+          <div className="search-box" style={{maxHeight:'90%'}}>
+            <input type="text" placeholder="Edificio" value={edificioBusqueda} onChange={(e) => setEdificioBusqueda(e.target.value)}/>
+            <br />
+            <input type="text" placeholder="Nombre" value={nombreSalaBusqueda} onChange={(e) => setNombreSalaBusqueda(e.target.value)}/>
+            <br />
+            <input type="text" placeholder="cod. Sala" value={codigoSalaBusqueda} onChange={(e) => setCodigoSalaBusqueda(e.target.value)} />
 
-          <button onClick={handleSearch}>Buscar</button>
-        
-          <div className="search-box-table">
-          <table>
-            <thead>
-              <tr>
-                <th>cod. Sala</th>
-                <th>Nombre</th>
-                <th>-</th>
-              </tr>
-            </thead>
-            <tbody>
-              {searchResult.map((sala, index) => (
-                <tr key={index}>
-                  <td>{sala.codigo}</td>
-                  <td>{sala.nombre}</td>
-                  <td>
-                    <button onClick={() => handleSelectSala(sala)} className={`imagenb ${selectedSala === sala ? 'imagen-seleccionada' : ''}`} >
-                      <img className="imagen-boton" src="sel.png" alt="Seleccionar" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+            <button onClick={handleSearch}>Buscar</button>
+          
+            <div className="search-box-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>cod. Sala</th>
+                    <th>Nombre</th>
+                    <th>-</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {searchResult.map((sala, index) => (
+                    <tr key={index}>
+                      <td>{sala.codigo}</td>
+                      <td>{sala.nombre}</td>
+                      <td>
+                        <button onClick={() => handleSelectSala(sala)} className={`imagenb ${selectedSala === sala ? 'imagen-seleccionada' : ''}`} >
+                          <img className="imagen-boton" src="sel.png" alt="Seleccionar" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
-      <div>
-      <div>
+      <div className='details-section '>  
         {renderDetalleSala()}
       </div>
-      </div>
-      </div>
     </>
-
-      
   );
 }
 

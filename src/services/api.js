@@ -114,3 +114,14 @@ export const updateModuloInAPI = async (ID_Modulo, moduloData) => {
     throw error;
   }
 };
+
+//EDIFICIOS
+//MODULOS
+export const fetchEdicicio = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/edificio/todo`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

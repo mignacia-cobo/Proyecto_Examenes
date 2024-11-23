@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { addDays, startOfWeek, format } from 'date-fns';
 import './VerDispSalas.css';
+import { fetchSalasConfirmadas } from '../../services/api';
 
 function VerDisponibilidadSalas() {
   const [salas, setSalas] = useState([]);
@@ -10,6 +11,35 @@ function VerDisponibilidadSalas() {
   const [codigoSalaFiltro, setCodigoSalaFiltro] = useState('');
   const [salaSeleccionada, setSalaSeleccionada] = useState(null);
   const [salasFiltradas, setSalasFiltradas] = useState([]); // Estado para los resultados de búsqueda
+
+//FUNCION PARA OBTENER LAS SALAS DE LA BASE DE DATOS
+  useEffect(() => {
+    const getSalas= async () => {
+      try {
+        const result = await fetchSalasConfirmadas();
+        console.log(result)
+        setSalas(result);
+      } catch (error) {
+        console.error('Error al obtener las salas:', error);
+      }
+    };
+    getSalas();
+  }, []);
+
+  //FUNCIÓN PARA FILTRA LAS SALAS SEGÚN LOS CRITERIOS DE BÚSQUEDA
+  const filtrarSalas = () => {
+    const lowerCaseNombreFiltro = nombreFiltro.toLowerCase();
+    const lowerCaseCodigoSalaFiltro = codigoSalaFiltro.toLowerCase();
+    const lowerCaseEdificioFiltro = edificioFiltro.toLowerCase();
+  
+    const salasFiltradas = salas.filter(sala =>
+      (codigoSalaFiltro ? sala.Codigo_sala.toLowerCase().includes(lowerCaseCodigoSalaFiltro) : true) &&
+      (nombreFiltro ? sala.Mombre_sala.toLowerCase().includes(lowerCaseNombreFiltro) : true) &&
+      (edificioFiltro ? sala.Edificio_ID.toLowerCase().includes(lowerCaseEdificioFiltro) : true)
+    );
+    setSalasFiltradas(salasFiltradas);
+  };
+  
 
   const obtenerFechasDeLaSemana = (fechaBase) => {
     let fechas = {};
@@ -32,13 +62,6 @@ function VerDisponibilidadSalas() {
     '19:51 - 20:30', '20:41 - 21:20', '21:21 - 22:00', '22:10 - 22:50'
   ];
 
-  useEffect(() => {
-    const salasGuardadas = localStorage.getItem('salas');
-    if (salasGuardadas) {
-      setSalas(JSON.parse(salasGuardadas));
-      setSalasFiltradas(JSON.parse(salasGuardadas)); // Cargar todas las salas por defecto
-    }
-  }, []);
 
   const renderCabeceraTabla = () => {
     return (
@@ -51,21 +74,7 @@ function VerDisponibilidadSalas() {
     );
   };
 
-  const filtrarSalas = () => {
-    console.log("Salas disponibles:", salas);
-
-    const lowerCaseNombreFiltro = nombreFiltro.toLowerCase();
-    const lowerCaseCodigoSalaFiltro = codigoSalaFiltro.toLowerCase();
-    const lowerCaseEdificioFiltro = edificioFiltro.toLowerCase();
   
-    const salasFiltradas = salas.filter(sala =>
-      (codigoSalaFiltro ? sala.codigo.toLowerCase().includes(lowerCaseCodigoSalaFiltro) : true) &&
-      (nombreFiltro ? sala.nombre.toLowerCase().includes(lowerCaseNombreFiltro) : true) &&
-      (edificioFiltro ? sala.edificio.toLowerCase().includes(lowerCaseEdificioFiltro) : true)
-    );
-  
-    setSalasFiltradas(salasFiltradas);
-  };
 
   const renderFilasTabla = () => {
     if (!salaSeleccionada || !salaSeleccionada.dias) {
@@ -117,7 +126,7 @@ function VerDisponibilidadSalas() {
       <div className='container-lateral'>
         <div className="search-section">
           <h2>Seleccionar Sala</h2>
-          <div className="search-box">
+          <div className="search-box" style={{maxHeight:'90%'}}>
             <input 
               type="date" 
               value={format(fechaSeleccionada, 'yyyy-MM-dd')} 
@@ -155,9 +164,9 @@ function VerDisponibilidadSalas() {
                 <tbody>
                   {salasFiltradas.map((sala, index) => (
                     <tr key={index}>
-                      <td>{sala.codigo}</td>
-                      <td>{sala.nombre}</td>
-                      <td>{sala.edificio}</td>
+                      <td>{sala.Codigo_sala}</td>
+                      <td>{sala.Nombre_sala}</td>
+                      <td>{sala.Edificio_ID}</td>
                       <td>
                         <button 
                           onClick={() => handleSelectSala(sala)} 
