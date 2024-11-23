@@ -1,21 +1,22 @@
 const express = require('express');
 const router = express.Router();
-const salaController = require('../controller/salaController');
-const moduloController = require('../controller/moduloController');
+const controller = require('../controller/Controller');
+
 
 //SALAS
-router.get('/salas/todo', salaController.obtenerSalasConfirmadas); 
-router.get('/salas/id/:id', salaController.obtenerSalaPorId);
-router.put('/salas/up/:id', salaController.actualizarSala);
-router.post('/salas/', salaController.guardarSala);
-router.delete('/salas/:id', salaController.handleEliminarSalaID);
+router.get('/salas/todo', controller.obtenerSalasConfirmadasC); 
+router.get('/salas/id/:id', controller.obtenerSalaPorIdC);
+router.put('/salas/up/:id', controller.actualizarSalaC);
+router.post('/salas/', controller.guardarSalaC);
+router.delete('/salas/:id', controller.handleEliminarSalaIDC);
 
 //MODULOS
-router.get('/modulos/todo', moduloController.obtenerModulos);
-router.get('/modulos/id/:id', moduloController.obtenerModuloPorId);
-router.put('/modulos/up/:id', moduloController.actualizarModulo);
-router.post('/modulos', moduloController.guardarModulo);
-router.delete('/modulos/:id', moduloController.eliminarModuloPorID);
+router.get('/modulos/todo', controller.obtenerModulosC);
+router.get('/modulos/id/:id', controller.obtenerModuloPorIdC);
+router.put('/modulos/up/:id', controller.actualizarModuloC);
+router.post('/modulos', controller.guardarModuloC);
+router.delete('/modulos/:id', controller.eliminarModuloPorIDC);
 
-
+//EDIFICIOS
+router.get('/edificio/todo', controller.obtenerEdificiosC);
 module.exports = router;

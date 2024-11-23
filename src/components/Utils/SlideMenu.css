@@ -9,6 +9,7 @@
     width: 15%;
     height: 100vh; 
     z-index: 100;
+    overflow: hidden;
 }
 .main-container.menu-collapsed .slide-container{
     position: fixed;
@@ -25,6 +26,7 @@
     background-color: #092C50; /* Azul oscuro similar al del logotipo */
     color: #FFCC33; /* Texto en blanco para contrasteeee */
     font-weight: bold;
+    overflow: hidden;
     
 }
 .side-menu .menu-item {
@@ -44,11 +46,11 @@
     background-color: #092C50; /* Azul oscuro similar al del logotipo */
     color: #FFCC33; /* Texto en blanco para contrasteeee */
     font-weight: bold;
-    
 }
 .side-menu ul li a {
-    display: block;
-    padding: 10px 0px;
+    position: relative;
+    display: flex;
+    padding: 10px 0px 10px 10px;
     color: white; /* color del texto blanco */
     text-decoration: none;
     transition: background-color 0.3s ease;
@@ -78,6 +80,7 @@
 .side-menu ul li:hover {
     background-color: #073f7b; /* Color al pasar el mouse */
     width: 100%;
+    align-items: flex-start;
 }
 
 .side-menu ul li a {

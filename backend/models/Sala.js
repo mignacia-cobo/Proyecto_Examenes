@@ -1,13 +1,12 @@
 const {DataTypes } = require('sequelize');
 const {sequelize} = require('../database');
-
+const Edificio = require('./Edificio');
 
 const Sala = sequelize.define('Sala', {
   ID_Sala: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true,
-    allowNull: false,
   },
   Codigo_sala: {
     type: DataTypes.STRING
@@ -18,16 +17,28 @@ const Sala = sequelize.define('Sala', {
   Capacidad: {
     type: DataTypes.INTEGER
   },
-  Edificio_ID: {
-    type: DataTypes.STRING
+  ID_Edificio: {
+    type: DataTypes.INTEGER,
+    references: {
+      model: Edificio,
+      key: 'ID_Edificio'
+    }
   },
-  Estado: {
-    type: DataTypes.BOOLEAN
+  ID_Estado:{
+    type: DataTypes.INTEGER,
+    references: {
+      model: 'Estado',
+      key: 'ID_Estado'
+    }
   }
 }, {
   tableName: 'Sala',
   timestamps: true // Si no tienes columnas de timestamps en tu tabla
 });
+
+// Definir las relaciones
+Edificio.hasMany(Sala, { foreignKey: 'ID_Edificio' });
+Sala.belongsTo(Edificio, { foreignKey: 'ID_Edificio' });
 
 // Sincronizar el modelo con la base de datos
 

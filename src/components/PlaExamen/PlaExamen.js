@@ -121,13 +121,7 @@ function PlaExamen(){
    }, [fechaSeleccionada]); 
 
   
- /* useEffect(() => {
-    // Cargar salas desde localStorage o inicializar vacías
-    const salasGuardadas = localStorage.getItem('salas');
-    if (salasGuardadas) {
-      setSalas(JSON.parse(salasGuardadas));
-    }
-  }, []);   */
+
 
    // Funciones para manejar los cambios de los inputs
    const handleEventoChange = (e) => setEventoSeleccionado(e.target.value);
@@ -165,7 +159,7 @@ function PlaExamen(){
   
 
 
-  /*const seleccionarModulo = (fecha, numeroModulo) => { */
+
   const seleccionarModulo = (dia, fecha, numeroModulo) => {
     if (new Date(fecha) < new Date()) {
       alert("No se puede seleccionar un módulo en una fecha pasada.");
@@ -614,7 +608,7 @@ useEffect(() => {
       <div className='container-lateral'>
         <div className="search-section">
           <h2>Buscar Examen</h2>
-          <div className="search-box">
+          <div className="search-box" style={{maxHeight:'40%'}}>
             {/* Inputs para sección, asignatura y docente */}
             <input type="text"  onChange={handleEventoChange} placeholder="Evento" />
             <input type="text"  onChange={handleSeccionChange} placeholder="Sección" />
@@ -657,7 +651,7 @@ useEffect(() => {
             </div>
           </div>  
           <h2>Buscar Salas</h2>
-          <div className="search-box">
+          <div className="search-box" style={{maxHeight:'45%'}}>
             <input type="date" value={format(fechaSeleccionada, 'yyyy-MM-dd')} onChange={(e) => setFechaSeleccionada(new Date(e.target.value))} />
             <br />
             <input type="text" placeholder="Edificio" value={edificioBusqueda} onChange={(e) => setEdificioBusqueda(e.target.value)} />

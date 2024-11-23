@@ -2,8 +2,7 @@ const express = require('express');
 const cors = require('cors'); // Importa el paquete cors
 const {conectarDB} = require('./database');
 const Routes = require('./routes/Routes');
-const Sala = require('./models/Sala');
-const Modulo = require('./models/Modulo');
+const { sequelize } = require('./models/Models');
 
 const app = express();
 const port = 3000;
@@ -14,9 +13,8 @@ app.use(express.json());
 // Conectar a la base de datos
 conectarDB();
 
-// Sincronizar modelos
-Sala.sync();
-Modulo.sync();
+// Sincronizar la base de datos
+sequelize.sync({ force: false });
 
 // Usar las rutas de sala
 app.use('/api', Routes);

@@ -2,31 +2,40 @@ const {DataTypes } = require('sequelize');
 const {sequelize} = require('../database');
 
 const Modulo = sequelize.define('Modulo', {
-  id: {
+  ID_Modulo: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true
   },
-  numero: {
+  Numero: {
     type: DataTypes.INTEGER,
     allowNull: false
   },
-  hora_inicio: {
+  Hora_inicio: {
     type: DataTypes.TIME,
     allowNull: false
   },
-  hora_final: {
+  Hora_final: {
     type: DataTypes.TIME,
     allowNull: false
   },
-  estado: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: true
+  ID_Estado: {
+    type: DataTypes.INTEGER,
+    references: {
+      model: 'Estado',
+      key: 'ID_Estado'  
+    }
   }
 }, {
   tableName: 'Modulo',
   timestamps: false // Si no tienes columnas de timestamps en tu tabla
 });
+
+// Un módulo tiene un estado
+Modulo.belongsTo(Estado, { foreignKey: 'ID_Estado' });
+// Un estado puede tener muchos módulos
+Estado.hasMany(Modulo, { foreignKey: 'ID_Estado' });
+
 
 // Sincronizar el modelo con la base de datos
 sequelize.sync()
