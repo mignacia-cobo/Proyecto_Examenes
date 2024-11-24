@@ -1,6 +1,5 @@
 // services.js
-const { Modulo, Sala, Edificio } = require('../models/Models');
-
+const { Sede, Edificio, Escuela, Usuario, Modulo, Carrera, Estado, Sala, Rol, Reserva, Asignatura, Examen } = require('../models/Models');
 // Servicios para Modulo
 const obtenerModuloPorId = async (id) => {
   try {
@@ -29,11 +28,21 @@ const actualizarModulo = async (id, moduloActualizado) => {
 
 const obtenerModulos = async () => {
   try {
-    return await Modulo.findAll();
+    const modulos = await Modulo.findAll({
+      include: {
+        model: Estado,
+        attributes: ['Nombre'],
+      },
+    });
+    console.log('Módulos obtenidos:', modulos);
+    return modulos;
   } catch (error) {
-    throw new Error('Error al obtener los modulos');
+    console.error('Error al obtener los módulos:', error.message);
+    console.error('Detalle del error:', error.stack);
+    throw new Error('Error al obtener los módulos');
   }
 };
+
 
 const guardarModulo = async (moduloData) => {
   try {
@@ -46,7 +55,7 @@ const guardarModulo = async (moduloData) => {
 
 const eliminarModuloPorID = async (id) => {
   try {
-    const result = await Modulo.destroy({ where: { id } });
+    const result = await Modulo.destroy({ where: { ID_Modulo : id } });
     return result;
   } catch (error) {
     throw new Error('Error al eliminar el modulo');
@@ -81,7 +90,13 @@ const actualizarSala = async (id, salaActualizada) => {
 
 const obtenerSalas = async () => {
   try {
-    return await Sala.findAll();
+    return await Sala.findAll({
+      include: {
+        model: Edificio, // Relación con la tabla Edificio
+        attributes: ['Nombre_Edificio'], // Solo obtén el nombre del edificio
+      },
+    });
+
   } catch (error) {
     throw new Error('Error al obtener las salas');
   }
@@ -98,7 +113,7 @@ const guardarSala = async (salaData) => {
 
 const eliminarSalaPorID = async (id) => {
   try {
-    const result = await Sala.destroy({ where: { id } });
+    const result = await Sala.destroy({ where: { ID_Sala: id } });
     return result;
   } catch (error) {
     throw new Error('Error al eliminar la sala');
@@ -117,6 +132,47 @@ const obtenerEdificios = async () => {
   }
 };
 
+//servicios para Estado
+const obtenerEstados = async () => {
+  try {
+    const estados = await Estado.findAll();
+    console.log('Obteniendo estados:', estados);
+    return estados;
+  } catch (error) {
+    console.error('Error al obtener los estados:', error);
+    throw new Error('Error al obtener las estados');
+  }
+};
+
+//Verificar disponibilidad de salas
+const verificarDisponibilidad = async (ID_Sala, Fecha, ID_Modulo) => {
+  const reserva = await Reserva.findOne({
+    where: { ID_Sala, Fecha, ID_Modulo }
+  });
+  return !reserva; // Devuelve true si no hay reserva
+};
+
+
+//Reservas en un dia
+const obtenerReservasPorFecha = async (Fecha) => {
+  return await Reserva.findAll({
+    where: { Fecha },
+    include: [
+      { model: Sala, attributes: ['Nombre_Sala'] },
+      { model: Modulo, attributes: ['Numero', 'Hora_Inicio', 'Hora_Final'] },
+      { model: Examen, include: [{ model: Asignatura, attributes: ['Nombre_Asignatura'] }] }
+    ]
+  });
+};
+//Realizar reservas 
+const reservarSala = async (datosReserva) => {
+  const disponibilidad = await verificarDisponibilidad(datosReserva.ID_Sala, datosReserva.Fecha, datosReserva.ID_Modulo);
+  if (!disponibilidad) {
+    throw new Error('La sala ya está reservada para este módulo y fecha.');
+  }
+  return await Reserva.create(datosReserva);
+};
+
 module.exports = {
   obtenerModuloPorId,
   actualizarModulo,
@@ -129,4 +185,5 @@ module.exports = {
   guardarSala,
   eliminarSalaPorID,
   obtenerEdificios,
+  obtenerEstados,
 };

@@ -10,7 +10,8 @@ const {
     guardarSala,
     eliminarSalaPorID,
     obtenerEdificios,
-  } = require('../services/service');
+    obtenerEstados,
+  } = require('../services/Service');
 
 // Controladores para Sala
 const obtenerSalaPorIdC = async (req, res) => {
@@ -115,9 +116,11 @@ const obtenerModulosC = async (req, res) => {
     const modulos = await obtenerModulos();
     res.json(modulos);
   } catch (error) {
+    console.error('Error obteniendo los modulos:', error);
     res.status(500).json({ message: 'Error al obtener los modulos' });
   }
 };
+
 
 const guardarModuloC = async (req, res) => {
   const moduloData = req.body;
@@ -151,6 +154,17 @@ const obtenerEdificiosC = async (req, res) => {
   }
 };
 
+//Estados
+const obtenerEstadosC = async (req, res) => {
+  try {
+      const estados = await obtenerEstados();
+      res.status(200).json(estados);
+  } catch (error) {
+      console.error('Error en obtenerEstadosC:', error.message);
+      res.status(500).json({ mensaje: 'Error al obtener los estados' });
+  }
+};
+
 module.exports = {
   obtenerSalaPorIdC,
   actualizarSalaC,
@@ -163,4 +177,5 @@ module.exports = {
   guardarModuloC,
   eliminarModuloPorIDC,
   obtenerEdificiosC,
+  obtenerEstadosC,
 };

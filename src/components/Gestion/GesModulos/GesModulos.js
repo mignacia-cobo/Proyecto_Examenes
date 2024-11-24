@@ -11,10 +11,10 @@ function GesModulos () {
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
     const [newModulo, setNewModulo] = useState({
-        numero: '',
-        hora_inicio: '00:00',
-        hora_final: '00:00',
-        estado: true,
+        Numero: '',
+        Hora_inicio: '00:00',
+        Hora_final: '00:00',
+        ID_Estado: 1,
     });
   
 
@@ -37,7 +37,7 @@ function GesModulos () {
         try{
             const response = await eliminarModuloAPI(id);
             console.log('Módulo eliminado ID_Modulo:', id, response);
-            setModulos(prevModulos => prevModulos.filter(modulo => modulo.id !== id));
+            setModulos(prevModulos => prevModulos.filter(modulo => modulo.ID_Modulo !== id));
             console.log('Modulos:', modulos);
             alert('Módulo eliminado');
         } catch (error) {
@@ -57,9 +57,10 @@ function GesModulos () {
             console.log('Módulo guardado:', response);
             setModulos([...modulos, newModulo]);
             setNewModulo({
-                numero: '',
-                hora_inicio: '00:00',
-                hora_final: '00:00',
+                Numero: '',
+                Hora_inicio: '00:00',
+                Hora_final: '00:00',
+                ID_Estado: 1,
             });
             alert('Módulo agregado con éxito.');
         } catch (error) {
@@ -80,9 +81,9 @@ function GesModulos () {
 
     //FILTRAR MODULOS
     const filteredModulos = modulos.filter(modulo =>
-        modulo.numero.toString().includes(searchTerm) ||
-        modulo.hora_inicio.toString().includes(searchTerm) ||
-        modulo.hora_final.toString().includes(searchTerm)
+        modulo.Numero.toString().includes(searchTerm) ||
+        modulo.Hora_inicio.toString().includes(searchTerm) ||
+        modulo.Hora_final.toString().includes(searchTerm)
     );
 
   
@@ -96,20 +97,20 @@ function GesModulos () {
                     <input
                     type='number'
                     placeholder='Número de Módulo'
-                    value={newModulo.numero}
-                    onChange={(e) => setNewModulo({ ...newModulo, numero: e.target.value })}
+                    value={newModulo.Numero}
+                    onChange={(e) => setNewModulo({ ...newModulo, Numero: e.target.value })}
                     />
                     <input
                     type='time'
                     placeholder='Hora Inicio'
-                    value={newModulo.hora_inicio}
-                    onChange={(e) => setNewModulo({ ...newModulo, hora_inicio: e.target.value })}
+                    value={newModulo.Hora_inicio}
+                    onChange={(e) => setNewModulo({ ...newModulo, Hora_inicio: e.target.value })}
                     />
                     <input
                     type='time'
                     placeholder='Hora Final'
-                    value={newModulo.hora_final}
-                    onChange={(e) => setNewModulo({ ...newModulo, hora_final: e.target.value })}
+                    value={newModulo.Hora_final}
+                    onChange={(e) => setNewModulo({ ...newModulo, Hora_final: e.target.value })}
                     />
                     <br></br>
                     <button onClick={guardarModulo}>Agregar Módulo</button>
@@ -149,10 +150,10 @@ function GesModulos () {
                                     </thead>
                                     <tbody>
                                         {modulos.map((modulo) => (
-                                            <tr key={modulo.id}>
-                                            <td>{modulo.numero}</td>
-                                            <td>{modulo.hora_inicio}</td>
-                                            <td>{modulo.hora_final}</td>
+                                            <tr key={modulo.ID_Modulo}>
+                                            <td>{modulo.Numero}</td>
+                                            <td>{modulo.Hora_inicio}</td>
+                                            <td>{modulo.Hora_final}</td>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -182,14 +183,14 @@ function GesModulos () {
                             </thead>
                             <tbody>
                                 {filteredModulos.map(modulo => (
-                                    <tr key={modulo.id}>
-                                        <td>{modulo.numero}</td>
-                                        <td>{modulo.hora_inicio}</td>
-                                        <td>{modulo.hora_final}</td>
-                                        <td>{(modulo.estado).toString()}</td>
+                                    <tr key={modulo.ID_Modulo}>
+                                        <td>{modulo.Numero}</td>
+                                        <td>{modulo.Hora_inicio}</td>
+                                        <td>{modulo.Hora_final}</td>
+                                        <td>{modulo.Estado.Nombre}</td>
                                         <td>
-                                            <FaEdit onClick={() => editarModulo(modulo.id)} style={{ cursor: 'pointer' }} />
-                                            <FaTrash onClick={() => eliminarModulo(modulo.id)} style={{ cursor: 'pointer' }} />
+                                            <FaEdit onClick={() => editarModulo(modulo.ID_Modulo)} style={{ cursor: 'pointer' }} />
+                                            <FaTrash onClick={() => eliminarModulo(modulo.ID_Modulo)} style={{ cursor: 'pointer' }} />
                                         </td>
                                     </tr>
                                 ))}
