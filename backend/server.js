@@ -1,8 +1,9 @@
 const express = require('express');
 const cors = require('cors'); // Importa el paquete cors
-const {conectarDB} = require('./database');
+//const {conectarDB} = require('./database');
 const Routes = require('./routes/Routes');
-const { sequelize } = require('./models/Models');
+//const { sequelize } = require('./models/Models');
+const { sequelize, conectarDB } = require('./database');
 
 const app = express();
 const port = 3000;

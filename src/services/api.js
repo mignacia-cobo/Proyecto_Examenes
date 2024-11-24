@@ -25,7 +25,7 @@ export const guardarSala = async (sala) => {
 
 export const eliminarSalasConfirmadas = async (salaId) => {
   try {
-    const response = await axios.delete(`${API_URL}/salas/${salaId}`);
+    const response = await axios.delete(`${API_URL}/salas/del/${salaId}`);
     return response.data;
   } catch (error) {
     console.error('Error al eliminar la sala confirmada:', error);
@@ -58,8 +58,8 @@ export const updateSalaInAPI = async (ID_Sala, salaData) => {
 // ELIMINAR SALA
 export const deleteSalaInAPI = async (ID_Sala) => {
   try {
-    console.log(axios.delete(`${API_URL}/salas/${ID_Sala}`));
-    const response = await axios.delete(`${API_URL}/salas/${ID_Sala}`);
+    console.log(axios.delete(`${API_URL}/salas/del/${ID_Sala}`));
+    const response = await axios.delete(`${API_URL}/salas/del/${ID_Sala}`);
     console.log('Response API:', response.data);
     return response.data;
   } catch (error) {
@@ -89,7 +89,7 @@ export const guardarModuloAPI = async (modulo) => {
 
 export const eliminarModuloAPI = async (id) => {
   try {
-    const response = await axios.delete(`${API_URL}/modulos/${id}`);
+    const response = await axios.delete(`${API_URL}/modulos/del/${id}`);
     return response.data;
   } catch (error) {
     throw error;
@@ -116,10 +116,19 @@ export const updateModuloInAPI = async (ID_Modulo, moduloData) => {
 };
 
 //EDIFICIOS
-//MODULOS
 export const fetchEdicicio = async () => {
   try {
     const response = await axios.get(`${API_URL}/edificio/todo`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+//ESTADOS
+export const fetchEstados = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/estados/todo`);
     return response.data;
   } catch (error) {
     throw error;

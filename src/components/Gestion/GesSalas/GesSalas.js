@@ -15,7 +15,8 @@ function GesSalas() {
     Codigo_sala: '',
     Nombre_sala: '',
     Capacidad: '',
-    Edificio_ID: '',
+    ID_Edificio: '',
+    ID_Estado: 1,
   });
 
   //OBTENER EDIFICIOS
@@ -34,7 +35,7 @@ function GesSalas() {
   }, []);
   // Manejar el cambio de selección del edificio
   const handleEdificioChange = (event) => {
-    setNewSala({ ...newSala, Edificio_ID: event.target.value });
+    setNewSala({ ...newSala, ID_Edificio: event.target.value });
   };
 
   //SE OBTIENEN LAS SALAS REGISTRADAS EN LA BASE DE DATOS
@@ -78,14 +79,27 @@ function GesSalas() {
         alert("El archivo no tiene el formato correcto.");
         return;
       }
-      const salasCargadas = jsonData.map((row, index) => ({
-        ID_Sala: index + 1,
-        Codigo_sala: row['codigo_sala'],
-        Nombre_sala: row['nombre_sala'],
-        Capacidad: row['capacidad'],
-        Edificio_ID: row['Edificio'],
-        Estado: true,
-      }));
+      const salasCargadas = jsonData.map((row, index) => {
+        // Encuentra el ID_Edificio correspondiente al Nombre_Edificio
+        const edificio = edificios.find(
+          (edificio) => edificio.Nombre_Edificio === row['Edificio']
+        );
+  
+        if (!edificio) {
+          alert(`El edificio "${row['Edificio']}" no existe en la base de datos.`);
+          return null; // Si el edificio no existe, no incluir esta sala
+        }
+  
+        return {
+          ID_Sala: index + 1,
+          Codigo_sala: row['codigo_sala'],
+          Nombre_sala: row['nombre_sala'],
+          Capacidad: row['capacidad'],
+          ID_Edificio: edificio.ID_Edificio, // Usamos el ID encontrado
+          ID_Estado: 1, // Valor predeterminado
+        };
+      }).filter((sala) => sala !== null); // Filtrar salas inválidas
+  
       setSalas(salasCargadas);
     };
     reader.readAsArrayBuffer(file);
@@ -109,6 +123,7 @@ function GesSalas() {
 
   //ELIMINA UNA SALA DE LA BASE DE DATOS, SE PASA EL ID CUANDO SE LLAMA AL METODO, EL ID SE OBTIENE DE LA FILA DE LA TABLA DE SALAS CONFIRMADAS
   const handleRemoveSalasConfirmadas = async (ID_Sala) => {
+    console.log('ID_Sala a eliminar:', ID_Sala);
     try {
       const response = await deleteSalaInAPI(ID_Sala);
       console.log('Sala eliminada ID_Sala:', ID_Sala, response);
@@ -129,7 +144,8 @@ function GesSalas() {
         Codigo_sala: '',
         Nombre_sala: '',
         Capacidad: '',
-        Edificio_ID: ''
+        ID_Edificio: '',
+        ID_Estado: 1,
       });
       alert('Sala agregada con éxito.');
     } catch (error) {
@@ -147,7 +163,7 @@ function GesSalas() {
     sala.Codigo_sala.toLowerCase().includes(searchTerm.toLowerCase()) ||
     sala.Nombre_sala.toLowerCase().includes(searchTerm.toLowerCase()) ||
     sala.Capacidad.toString().includes(searchTerm) ||
-    sala.Edificio_ID.toString().toLowerCase().includes(searchTerm.toLowerCase()),
+    sala.ID_Edificio.toString().toLowerCase().includes(searchTerm.toLowerCase()),
     console.log('salas confirmadas para filtrar',salasConfirmadas)
   );
 
@@ -177,22 +193,16 @@ function GesSalas() {
               onChange={(e) => setNewSala({ ...newSala, Capacidad: e.target.value })}
             />
             <select
-              value={newSala.Edificio_ID}
+              value={newSala.ID_Edificio}
               placeholder='Edificio'
               onChange={handleEdificioChange}>
               <option value="">Seleccione un edificio</option>
                 {edificios.map(edificio => (
-                  <option key={edificio.id} value={edificio.id}>
+                  <option key={edificio.ID_Edificio} value={edificio.ID_Edificio}>
                     {edificio.Nombre_Edificio}
                   </option>
           ))}
             </select>
-            <input
-              type='text'
-              placeholder='ID de Edificio'
-              value={newSala.Edificio_ID}
-              onChange={(e) => setNewSala({ ...newSala, Edificio_ID: e.target.value })}
-            />
             <br></br>
             <button onClick={handleAddSala}>Agregar Sala</button>
           </div>
@@ -240,7 +250,7 @@ function GesSalas() {
                           <td>{sala.Codigo_sala}</td>
                           <td>{sala.Nombre_sala}</td>
                           <td>{sala.Capacidad}</td>
-                          <td>{sala.Edificio_ID}</td>
+                          <td>{sala.ID_Edificio}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -277,7 +287,7 @@ function GesSalas() {
                     <td>{sala.Codigo_sala}</td>
                     <td>{sala.Nombre_sala}</td>
                     <td>{sala.Capacidad}</td>
-                    <td>{sala.Edificio_ID}</td>
+                    <td>{sala.Edificio.Nombre_Edificio}</td>
                     <td>
                       <FaEdit onClick={() => handleEdit(sala.ID_Sala)} style={{ cursor: 'pointer' }} />
                       <FaTrash onClick={() => handleRemoveSalasConfirmadas(sala.ID_Sala)} style={{ cursor: 'pointer' }} />
