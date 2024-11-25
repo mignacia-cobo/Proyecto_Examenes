@@ -268,16 +268,16 @@ table thead th {
 }
 .details-section-content{
   display: flex;
-  margin: 5px;
-  padding-top: 1%;
+  margin: 2px;
+  padding-top: 5px;
 }
 .details-section-table {
   overflow-y: auto;
   width: 64.8%;
   display: flex;
   position: fixed;
-  height: 99%;
-  max-height: 90%;
+  height: 80%;
+  max-height: 80%;
   margin-bottom: 5px;
   flex-direction: column;
   align-items: center;

@@ -1,3 +1,4 @@
+const xlsx = require("xlsx");
 const {
     obtenerModuloPorId,
     actualizarModulo,
@@ -18,7 +19,69 @@ const {
     crearReserva,
     obtenerExamenes,
     crearReservaConModulos,
+    actualizarEstadoSala,
+    insertarDatosDesdeArchivo,
+  
   } = require('../services/Service');
+
+
+//CARGA MASIVA INICAL
+const procesarArchivoC = async (req, res) => {
+  try {
+    const workbook = xlsx.readFile(req.file.path);
+    const sheetName = workbook.SheetNames[0];
+    const datos = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
+
+    const datosProcesados = datos.map(row => ({
+      escuela: row["Escuela"],
+      jornada: row["Jornada"],
+      carrera: row["Carrera Genérica"],
+      asignatura: row["Nom. Asignatura"],
+      nivel: row["Nivel"],
+      seccion: row["Sección"],
+      inscritos: row["Inscritos (Sábana)"],
+      tipoProcesamiento: row["Tipo de Procesamiento"],
+      plataformaProcesamiento: row["Plataforma de Procesamiento"],
+      situacionEvaluativa: row["Situación Evaluativa"],
+      tiempoAsignado: row["Tiempo Asignado (módulos)"],
+    }));
+
+    res.json(datosProcesados);
+  } catch (error) {
+    console.error("Error al procesar el archivo:", error);
+    res.status(500).json({ error: "Error al procesar el archivo" });
+  }
+};
+
+const confirmarDatosC = async (req, res) => {
+  try {
+    await insertarDatosDesdeArchivo(req.body.datos);
+    res.json({ message: "Datos confirmados y cargados correctamente" });
+  } catch (error) {
+    console.error("Error al confirmar los datos:", error);
+    res.status(500).json({ error: "Error al confirmar los datos" });
+  }
+};
+
+
+//ACTUALIZAR ESTADO DE UNA SALA CUANDO ES SEELCCIONADA
+const actualizarEstadoSalaC = async (req, res) => {
+  console.log('Actualizando estado de la sala: ', req.params);
+  const { ID_Sala, ID_Estado } = req.params; // Obtener datos del cuerpo de la solicitud
+  console.log('Datos recibidos en el controlador:', ID_Sala, ID_Estado);
+
+  if (!ID_Sala || ID_Estado === undefined) {
+    return res.status(400).json({ message: 'ID_Sala e ID_Estado son requeridos' });
+  }
+
+  try {
+    const salaActualizada = await actualizarEstadoSala(ID_Sala, ID_Estado);
+    return res.json({ message: 'Estado de la sala actualizado', sala: salaActualizada });
+  } catch (error) {
+    console.error('Error al actualizar el estado de la sala:', error);
+    res.status(500).json({ message: 'Error al actualizar el estado de la sala' });
+  }
+};
 
 
 // Obtener exámenes
@@ -234,5 +297,7 @@ module.exports = {
   obtenerReservasPorFechaC,
   obtenerReservasC,
   obtenerExamenesC,
-
+  actualizarEstadoSalaC,
+  procesarArchivoC,
+  confirmarDatosC,
 };
