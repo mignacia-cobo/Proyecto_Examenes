@@ -3,7 +3,7 @@ import { format, startOfWeek, addDays, eachDayOfInterval } from 'date-fns';
 import { es } from 'date-fns/locale';
 import './PlaExamen.css';
 import { FaArrowCircleRight,FaCircle } from "react-icons/fa";
-import { fetchReservas, crearReserva, fetchSalasConfirmadas, fetchExamenes, fetchModulos } from '../../services/api';
+import { fetchReservas, crearReserva, fetchSalasConfirmadas, fetchExamenes, fetchModulos,actualizarEstadoSala } from '../../services/api';
 
 function PlaExamen() {
   const [salas, setSalas] = useState([]);
@@ -33,7 +33,7 @@ function PlaExamen() {
         const examenesData = await fetchExamenes();
         const modulosData = await fetchModulos();
         const reservasData = await fetchReservas();
-
+        console.log('Datos cargados:', salasData, examenesData, modulosData, reservasData);
         setSalas(salasData);
         setExamenes(examenesData);
         setModulos(modulosData);
@@ -57,6 +57,38 @@ function PlaExamen() {
       console.log("Seleccionado:", examen);
       setExamenSeleccionado(examen);
       setSelectedExam(examen);
+    }
+  };
+
+  //MANEJAR LA SELECCION DE SALA
+  const manejarSeleccionSala = async (sala) => {
+    try {
+      // Si ya hay una sala seleccionada, cambiar su estado a "disponible" (por ejemplo, ID_Estado = 1)
+      if (selectedSala) {
+        await actualizarEstadoSala(selectedSala.ID_Sala, 1); // Cambiar estado de la sala previa
+      }
+  
+      // Cambiar el estado de la nueva sala a "ocupada" (por ejemplo, ID_Estado = 2)
+      await actualizarEstadoSala(sala.ID_Sala, 2);
+  
+      // Actualizar el estado local para reflejar los cambios
+      setSalas((prevSalas) =>
+        prevSalas.map((s) =>
+          s.ID_Sala === sala.ID_Sala
+            ? { ...s, ID_Estado: 2 } // Nueva sala seleccionada
+            : s.ID_Sala === selectedSala?.ID_Sala
+            ? { ...s, ID_Estado: 1 } // Sala previa vuelve a estar disponible
+            : s
+        )
+      );
+  
+      // Actualizar el estado de la sala seleccionada
+      setSelectedSala(sala);
+  
+      console.log(`Sala seleccionada: ${sala.Nombre_sala}`);
+    } catch (error) {
+      console.error('Error al manejar la selección de la sala:', error);
+      alert('Hubo un error al actualizar el estado de la sala');
     }
   };
 
@@ -215,14 +247,21 @@ function PlaExamen() {
                   </tr>
                 </thead>
                 <tbody>
-                  {salas.map((sala) => (
-                    <tr key={sala.ID_Sala}>
+                {salas.filter((sala) => sala.ID_Estado === 1) // Usar estado dinámico
+                      .map((sala) => (
+                    <tr
+                      key={sala.ID_Sala}
+                      className={selectedSala?.ID_Sala === sala.ID_Sala ? 'fila-seleccionada' : ''}
+                    >
                       <td>{sala.ID_Sala}</td>
                       <td>{sala.Nombre_sala}</td>
                       <td>{sala.Codigo_sala}</td>
                       <td>
-                        <button 
-                        onClick={() => setSelectedSala(sala)}>Seleccionar</button>
+                        <FaArrowCircleRight
+                          className={`icono ${selectedSala?.ID_Sala === sala.ID_Sala ? 'seleccionado' : ''}`} 
+                          onClick={() => manejarSeleccionSala(sala)
+                          }
+                        />
                       </td>
                     </tr>
                   ))}
@@ -236,16 +275,16 @@ function PlaExamen() {
               <table>
                 <thead>
                   <tr>
-                    <th>ID Examen</th>
-                    <th>Nombre del Examen</th>
+                    <th>Sección</th>
+                    <th>Asignatura</th>
                     <th>Acción</th>
                   </tr>
                 </thead>
                 <tbody>
                   {examenes.map((examen) => (
                     <tr key={examen.ID_Examen}>
-                      <td>{examen.ID_Examen}</td>
-                      <td>{examen.Nombre_Examen}</td>
+                      <td>{examen.Seccion}</td>
+                      <td>{examen.Asignatura?.Nombre_Asignatura}</td>
                       <td>
                         {examen.ID_Estado === 3 ? (
                           <FaCircle className="icono-reserv" />

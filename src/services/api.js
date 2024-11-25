@@ -190,3 +190,47 @@ export const fetchReservas = async () => {
     throw error;
   }
 };
+
+//FUNCION PARA ACTUALIZAR ESTADO DE UNA SALA SELECCIONADA
+export const actualizarEstadoSala = async (ID_Sala, ID_Estado) => {
+  try {
+    console.log('Datos recibidos en el servicio:', ID_Sala, ID_Estado);
+    const response = await axios.put(`${API_URL}/salas/estado/${ID_Sala}/${ID_Estado}`);// Realiza la petición PUT a la API
+    return response.data.sala; // Devuelve la sala actualizada
+  } catch (error) {
+    console.error('Error al actualizar el estado de la sala:', error.response?.data || error.message);
+    throw new Error(error.response?.data.message || 'Error al actualizar la sala');
+  }
+};
+
+//CARGA INICIAL
+// Subir archivo Excel
+export const uploadFile = async (file) => {
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await axios.post(`${API_URL}/archivo/upload`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    // Retorna los datos procesados para previsualización
+    return response.data;
+  } catch (error) {
+    console.error('Error al subir el archivo:', error);
+    throw error;
+  }
+};
+
+// Confirmar carga de datos procesados
+export const confirmUpload = async (data) => {
+  try {
+    const response = await axios.post(`${API_URL}/archivo/confirmar`, { datos: data });
+    return response.data;
+  } catch (error) {
+    console.error('Error al confirmar la carga de datos:', error);
+    throw error;
+  }
+};

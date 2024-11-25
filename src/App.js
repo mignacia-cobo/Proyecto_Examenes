@@ -15,6 +15,7 @@ import ReportesAlumno from './components/Reportes/ReportesAlumno/ReportesAlumno'
 import EditarSala from './components/Gestion/GesSalas/EditarSala';
 import GesModulos from './components/Gestion/GesModulos/GesModulos';
 import EditarModulo from './components/Gestion/GesModulos/EditarModulo';
+import GesInicial from './components/Gestion/GesInicial/GesInicial';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -68,6 +69,7 @@ function App() {
                 <Route path="/EditarModulo/:id" element={<EditarModulo />} /> {/* Nueva ruta para editar sala */}
                 <Route path="/GestionExamenes" element={<GesExamen />} />
                 <Route path="/Gestion/Alumnos" element={<GesAlumnos />} />
+                <Route path="/Gestion/CargaInicial" element={<GesInicial />} />
                  {/*<Route path="/Gestion/Usuarios" element={<GesUser />} /> */}
                 <Route path="/Reportes/ReportesDocente" element={<ReportesDocente/>} />
                 <Route path="/Reportes/ReportesAlumno" element={<ReportesAlumno/>} />

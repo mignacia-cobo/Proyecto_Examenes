@@ -159,7 +159,7 @@ function GesSalas() {
   };
   
   //FILTRAR SALAS
-  const filteredSalas = salasConfirmadas.filter(sala =>
+  const filteredSalas = salasConfirmadas?.filter(sala =>
     sala.Codigo_sala.toLowerCase().includes(searchTerm.toLowerCase()) ||
     sala.Nombre_sala.toLowerCase().includes(searchTerm.toLowerCase()) ||
     sala.Capacidad.toString().includes(searchTerm) ||

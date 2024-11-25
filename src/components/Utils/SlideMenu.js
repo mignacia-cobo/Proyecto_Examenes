@@ -34,6 +34,7 @@ const SlideMenu = ({ isExpanded, onToggleMenu }) => {
                   <li><Link to="/Gestion/Modulos">Modulos</Link></li>
                   <li><Link to="/GestionExamenes">Exámenes</Link></li>
                   <li><Link to="/Gestion/Alumnos">Alumnos</Link></li>
+                  <li><Link to="/Gestion/CargaInicial">Carga Inicial</Link></li>
                 </div>
               )}
             </div>
