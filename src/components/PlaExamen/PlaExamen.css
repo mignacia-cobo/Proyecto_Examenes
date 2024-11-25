@@ -1,2 +1,25 @@
-
+.icono {
+    color: gray; /* Color inicial */
+    font-size: 28px;
+    transition: color 0.3s ease; /* Transición suave */
+  }
   
+  .icono:hover {
+    color: #fc3; /* Color cuando el cursor pasa encima */
+  }
+  
+  .icono:active {
+    color: #092C50; /* Color al hacer clic */
+  }
+  
+  .icono.seleccionado {
+    color: #007bff;; /* Color cuando el ícono está seleccionado */
+  }
+  .icono.seleccionado {
+    color: #007bff !important; /* Forzar el color seleccionado */
+  }
+  .icono-reserv {
+    color:#092C50;
+    font-size: 28px;
+    transition: color 0.3s ease; /* Transición suave */
+  }

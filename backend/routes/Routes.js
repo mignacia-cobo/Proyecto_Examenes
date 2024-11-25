@@ -23,4 +23,14 @@ router.get('/edificio/todo', controller.obtenerEdificiosC);
 //ESTADOS
 router.get('/estados/todo', controller.obtenerEstadosC);
 
+// RESERVAS
+router.post('/reservas', controller.crearReservaC);
+router.get('/reservas/todo', controller.obtenerReservasC);
+router.get('/reservas/fecha/:fecha', controller.obtenerReservasPorFechaC);
+
+// Exámenes
+router.get('/examenes/todo', controller.obtenerExamenesC);
+
+// Reservas
+router.post('/reservas', controller.crearReservaC);
 module.exports = router;
