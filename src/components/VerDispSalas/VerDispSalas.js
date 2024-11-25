@@ -166,7 +166,7 @@ function VerDisponibilidadSalas() {
                     <tr key={index}>
                       <td>{sala.Codigo_sala}</td>
                       <td>{sala.Nombre_sala}</td>
-                      <td>{sala.Edificio_ID}</td>
+                      <td>{sala.Edificio.Nombre_Edificio}</td>
                       <td>
                         <button 
                           onClick={() => handleSelectSala(sala)} 

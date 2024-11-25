@@ -1,5 +1,129 @@
 // services.js
-const { Sede, Edificio, Escuela, Usuario, Modulo, Carrera, Estado, Sala, Rol, Reserva, Asignatura, Examen } = require('../models/Models');
+const { Sede, Edificio, Escuela, Usuario, Modulo, Carrera, Estado, Sala, Rol, Reserva, Asignatura, Examen , ReservaModulo } = require('../models/Models');
+
+  async function crearReservaConModulos(data) {
+    console.log('Creando reserva con módulos:', data);
+    try {
+      
+      const { Fecha, ID_Sala, ID_Examen, Modulos } = data;
+      console.log('Creando reserva con módulos service.js:', data);
+      // Validar los datos entrantes
+      // if (!fecha || !ID_Sala || !ID_Examen || !Array.isArray(modulos) || modulos.length === 0) {
+      //  console.error('Datos incompletos:', data);
+      //  throw new Error('Datos incompletos. Se requiere fecha, ID_Sala, ID_Examen y al menos un módulo.',fecha, ID_Sala, ID_Examen ,modulos);
+      //}
+     
+      // Crear la nueva reserva
+      const nuevaReserva = await Reserva.create({
+        Fecha,
+        ID_Sala,
+        ID_Examen,
+      });
+
+      // Preparar los datos para insertar en la tabla intermedia ReservaModulo
+      const modulosReservados = Modulos.map((modulo) => {
+        if (!modulo.ID_Modulo) {
+          throw new Error('Cada módulo debe tener un ID_Modulo.');
+        }
+        return {
+          ID_Reserva: nuevaReserva.ID_Reserva,
+          ID_Modulo: modulo.ID_Modulo,
+        };
+      });
+  
+      await Examen.update(
+        { ID_Estado: 3 },
+        { where: { ID_Examen } }
+      );
+
+      // Insertar los módulos asociados a la reserva
+      await ReservaModulo.bulkCreate(modulosReservados);
+
+      // Retornar la nueva reserva con los módulos asociados para confirmar
+      const reservaConModulos = await Reserva.findByPk(nuevaReserva.ID_Reserva, {
+        include: [
+          { model: Modulo, through: { attributes: [] } }, // Incluye los módulos asociados
+          { model: Sala, attributes: ['Nombre_sala', 'Codigo_sala'] }, // Incluye detalles de la sala
+          { model: Examen, attributes: ['Nombre_Examen'] }, // Incluye detalles del examen
+        ],
+      });
+
+      return reservaConModulos;
+    } catch (error) {
+      console.error('Error al crear la reserva con módulos:', error);
+      throw error; // Re-lanzar el error para que el controlador lo maneje
+    }
+  }
+
+
+// Verificar disponibilidad de la sala
+const verificarDisponibilidad = async (ID_Sala, Fecha, ID_Modulo) => {
+  const reserva = await Reserva.findOne({ where: { ID_Sala, Fecha, ID_Modulo } });
+  return !reserva; // Devuelve true si no hay reserva
+};
+
+// Reservar sala
+const reservarSala = async (datosReserva) => {
+  const disponibilidad = await verificarDisponibilidad(datosReserva.ID_Sala, datosReserva.Fecha, datosReserva.ID_Modulo);
+  if (!disponibilidad) {
+    throw new Error('La sala ya está reservada para este módulo y fecha.');
+  }
+  return await Reserva.create(datosReserva);
+};
+
+// Obtener exámenes
+const obtenerExamenes = async () => {
+  try {
+    const examenes = await Examen.findAll();
+    return examenes;
+  } catch (error) {
+    console.error('Error al obtener exámenes:', error);
+    throw error;
+  }
+};
+
+// Crear reserva
+const crearReserva = async (reservaData) => {
+  try {
+    const nuevaReserva = await Reserva.create(reservaData);
+    return nuevaReserva;
+  } catch (error) {
+    console.error('Error al crear reserva:', error);
+    throw error;
+  }
+};
+
+
+// Obtener reservas por fecha
+const obtenerReservasPorFecha = async (Fecha) => {
+  return await Reserva.findAll({
+    where: { Fecha },
+    include: [
+      { model: Sala, attributes: ['Nombre_Sala'] },
+      { model: Modulo, attributes: ['Numero', 'Hora_Inicio', 'Hora_Final'] },
+      { model: Examen, include: [{ model: Asignatura, attributes: ['Nombre_Asignatura'] }] }
+    ],
+  });
+};
+
+// Obtener todas las reservas
+const obtenerReservas = async () => {
+  try {
+    const reservas = await Reserva.findAll({
+      include: [
+        { model: Sala, attributes: ['Nombre_sala', 'Codigo_sala'] },
+        { model: Modulo, through: { attributes: [] }, attributes: ['ID_Modulo', 'Numero', 'Hora_inicio', 'Hora_final'] },
+        { model: Examen, attributes: ['Nombre_Examen'] },
+      ],
+    });
+    return reservas;
+  } catch (error) {
+    console.error('Error al obtener reservas:', error);
+    throw new Error('Error al obtener reservas');
+  }
+};
+
+
 // Servicios para Modulo
 const obtenerModuloPorId = async (id) => {
   try {
@@ -144,34 +268,7 @@ const obtenerEstados = async () => {
   }
 };
 
-//Verificar disponibilidad de salas
-const verificarDisponibilidad = async (ID_Sala, Fecha, ID_Modulo) => {
-  const reserva = await Reserva.findOne({
-    where: { ID_Sala, Fecha, ID_Modulo }
-  });
-  return !reserva; // Devuelve true si no hay reserva
-};
 
-
-//Reservas en un dia
-const obtenerReservasPorFecha = async (Fecha) => {
-  return await Reserva.findAll({
-    where: { Fecha },
-    include: [
-      { model: Sala, attributes: ['Nombre_Sala'] },
-      { model: Modulo, attributes: ['Numero', 'Hora_Inicio', 'Hora_Final'] },
-      { model: Examen, include: [{ model: Asignatura, attributes: ['Nombre_Asignatura'] }] }
-    ]
-  });
-};
-//Realizar reservas 
-const reservarSala = async (datosReserva) => {
-  const disponibilidad = await verificarDisponibilidad(datosReserva.ID_Sala, datosReserva.Fecha, datosReserva.ID_Modulo);
-  if (!disponibilidad) {
-    throw new Error('La sala ya está reservada para este módulo y fecha.');
-  }
-  return await Reserva.create(datosReserva);
-};
 
 module.exports = {
   obtenerModuloPorId,
@@ -186,4 +283,11 @@ module.exports = {
   eliminarSalaPorID,
   obtenerEdificios,
   obtenerEstados,
+  verificarDisponibilidad,
+  reservarSala,
+  obtenerReservasPorFecha,
+  obtenerReservas,
+  crearReserva,
+  obtenerExamenes,
+  crearReservaConModulos,
 };

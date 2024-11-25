@@ -11,7 +11,59 @@ const {
     eliminarSalaPorID,
     obtenerEdificios,
     obtenerEstados,
+    reservarSala, 
+    obtenerReservasPorFecha,
+    verificarDisponibilidad,
+    obtenerReservas,
+    crearReserva,
+    obtenerExamenes,
+    crearReservaConModulos,
   } = require('../services/Service');
+
+
+// Obtener exámenes
+const obtenerExamenesC = async (req, res) => {
+  try {
+    const examenes = await obtenerExamenes();
+    res.status(200).json(examenes);
+  } catch (error) {
+    console.error('Error al obtener exámenes:', error);
+    res.status(500).json({ message: 'Error al obtener exámenes' });
+  }
+};
+
+// Crear reserva
+async function crearReservaC(req, res) {
+  try {
+    const reserva = await crearReservaConModulos(req.body);
+    console.log('Reserva creada:', reserva);
+    res.status(201).json(reserva);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al crear la reserva.' });
+  }
+}
+// Obtener reservas por fecha
+const obtenerReservasPorFechaC = async (req, res) => {
+  const { fecha } = req.params;
+  try {
+    const reservas = await obtenerReservasPorFecha(fecha);
+    res.status(200).json(reservas);
+  } catch (error) {
+    console.error('Error al obtener reservas por fecha:', error.message);
+    res.status(500).json({ message: 'Error al obtener reservas', error: error.message });
+  }
+};
+
+// Controlador para obtener todas las reservas
+const obtenerReservasC = async (req, res) => {
+  try {
+    const reservas = await obtenerReservas(); // Llama al servicio que definimos previamente
+    res.status(200).json(reservas);
+  } catch (error) {
+    console.error('Error al obtener todas las reservas:', error.message);
+    res.status(500).json({ message: 'Error al obtener reservas', error: error.message });
+  }
+};
 
 // Controladores para Sala
 const obtenerSalaPorIdC = async (req, res) => {
@@ -178,4 +230,9 @@ module.exports = {
   eliminarModuloPorIDC,
   obtenerEdificiosC,
   obtenerEstadosC,
+  crearReservaC,
+  obtenerReservasPorFechaC,
+  obtenerReservasC,
+  obtenerExamenesC,
+
 };

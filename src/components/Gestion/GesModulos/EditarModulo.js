@@ -11,10 +11,10 @@ function EditarModulo() {
   const navigate = useNavigate();
   const [estados, setEstados] = useState([]);
   const [modulo, setModulo] = useState({
-    numero: 0,
-    hora_inicio: '00:00',
-    hora_final: '00:00',
-    estado: true,
+    Numero: 0,
+    Hora_inicio: '00:00',
+    Hora_final: '00:00',
+    ID_Estado: '',
   });
 
   //SE OBTIENE EL MODULO PARA MOSTRARLO EN EL FORMULARIO
@@ -76,19 +76,19 @@ function EditarModulo() {
         <input
           type="number"
           value={modulo.Numero}
-          onChange={(e) => setModulo({ ...modulo, numero: e.target.value })}
+          onChange={(e) => setModulo({ ...modulo, Numero: e.target.value })}
           placeholder="Número"
         />
         <input
           type="time"
           value={modulo.Hora_inicio}
-          onChange={(e) => setModulo({ ...modulo, hora_inicio: e.target.value })}
+          onChange={(e) => setModulo({ ...modulo, Hora_inicio: e.target.value })}
           placeholder="Hora Inicio"
         />
         <input
           type="time"
           value={modulo.Hora_final}
-          onChange={(e) => setModulo({ ...modulo, hora_final: e.target.value })}
+          onChange={(e) => setModulo({ ...modulo, Hora_final: e.target.value })}
           placeholder="Hora Final"
         />
         <select

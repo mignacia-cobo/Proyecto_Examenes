@@ -134,3 +134,59 @@ export const fetchEstados = async () => {
     throw error;
   }
 };
+
+//RESERVAS
+// Obtener exámenes
+export const fetchExamenes = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/examenes/todo`);
+    return response.data;
+  } catch (error) {
+    console.error('Error al obtener los exámenes:', error);
+    throw error;
+  }
+};
+
+// Crear reserva
+export const crearReserva = async (reserva) => {
+  try {
+    const response = await axios.post(`${API_URL}/reservas`, reserva);
+    return response.data;
+  } catch (error) {
+    console.error('Error al crear la reserva:', error);
+    throw error;
+  }
+};
+
+// Reservar sala ESTA NO USO 
+export const reservarSalaAPI = async (reserva) => {
+  try {
+    const response = await axios.post(`${API_URL}/reservas`, reserva);
+    return response.data;
+  } catch (error) {
+    console.error('Error al reservar la sala:', error);
+    throw error;
+  }
+};
+
+// Obtener reservas por fecha
+export const fetchReservasPorFecha = async (fecha) => {
+  try {
+    const response = await axios.get(`${API_URL}/reservas/fecha/${fecha}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error al obtener reservas por fecha:', error);
+    throw error;
+  }
+};
+
+// Función para obtener todas las reservas
+export const fetchReservas = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/reservas/todo`);
+    return response.data; // Retorna los datos de las reservas al cliente
+  } catch (error) {
+    console.error('Error al obtener las reservas desde la API:', error.message);
+    throw error;
+  }
+};

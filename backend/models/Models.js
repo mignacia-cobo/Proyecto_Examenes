@@ -119,10 +119,6 @@ const Reserva = sequelize.define('Reserva', {
     type: DataTypes.INTEGER,
     references: { model: Sala, key: 'ID_Sala' }
   },
-  ID_Modulo: {
-    type: DataTypes.INTEGER,
-    references: { model: Modulo, key: 'ID_Modulo' }
-  },
   ID_Examen: {
     type: DataTypes.INTEGER,
     references: { model: Examen, key: 'ID_Examen' }
@@ -139,7 +135,28 @@ const Estado = sequelize.define('Estado', {
   Nombre: { type: DataTypes.STRING, allowNull: false }
 }, { tableName: 'Estado', freezeTableName: true, timestamps: false });
 
+const ReservaModulo = sequelize.define('ReservaModulo', {
+  ID_Reserva: {
+    type: DataTypes.INTEGER,
+    references: {
+      model: 'Reserva',
+      key: 'ID_Reserva',
+    },
+  },
+  ID_Modulo: {
+    type: DataTypes.INTEGER,
+    references: {
+      model: 'Modulo',
+      key: 'ID_Modulo',
+    },
+  },
+}, { tableName: 'ReservaModulo', freezeTableName: true, timestamps: false });
+
+
 // Relaciones principales
+//reservaModulo
+Reserva.belongsToMany(Modulo, { through: ReservaModulo, foreignKey: 'ID_Reserva' });
+Modulo.belongsToMany(Reserva, { through: ReservaModulo, foreignKey: 'ID_Modulo' });
 
 // Sede
 Sede.hasMany(Escuela, { foreignKey: 'ID_Sede' });
@@ -153,11 +170,6 @@ Escuela.belongsTo(Sede, { foreignKey: 'ID_Sede' });
 Carrera.belongsTo(Escuela, { foreignKey: 'ID_Escuela' });
 Carrera.hasMany(Asignatura, { foreignKey: 'ID_Carrera' });
 Carrera.belongsTo(Usuario, { foreignKey: 'ID_Coordinador' });
-
-// Reserva
-Reserva.belongsTo(Sala, { foreignKey: 'ID_Sala' });
-Reserva.belongsTo(Modulo, { foreignKey: 'ID_Modulo' });
-Reserva.belongsTo(Examen, { foreignKey: 'ID_Examen' });
 
 // Asignatura y Examen
 Asignatura.hasMany(Examen, { foreignKey: 'ID_Asignatura' });
@@ -174,6 +186,15 @@ Sala.belongsTo(Edificio, { foreignKey: 'ID_Edificio' });
 Estado.hasMany(Sala, { foreignKey: 'ID_Estado' });
 Sala.belongsTo(Estado, { foreignKey: 'ID_Estado' });
 
+//Relaciones de reserva
+Reserva.belongsToMany(Modulo, {through: 'ReservaModulo', foreignKey: 'ID_Reserva',otherKey: 'ID_Modulo',});
+Reserva.belongsTo(Sala, {foreignKey: 'ID_Sala',});
+Reserva.belongsTo(Examen, {foreignKey: 'ID_Examen',});
+
+//Relacion de modulo
+Modulo.belongsToMany(Reserva, {through: 'ReservaModulo', foreignKey: 'ID_Modulo',otherKey: 'ID_Reserva',});
+
+
 module.exports = {
-  Sede, Edificio, Escuela, Usuario, Carrera, Asignatura, Examen, Sala, Modulo, Reserva, Rol, Estado
+  Sede, Edificio, Escuela, Usuario, Carrera, Asignatura, Examen, Sala, Modulo, Reserva, Rol, Estado, ReservaModulo
 };
