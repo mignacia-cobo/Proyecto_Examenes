@@ -37,6 +37,7 @@
   top: 12%;
   flex-direction: row;
   background: #ffffff;
+  text-transform: uppercase;
 
 }
 /* Ajustar el margen izquierdo según el estado del menú */
@@ -110,20 +111,24 @@
 
 .search-section h2 {
   color: #092c50;
-  font-size: 16px;
+  font-size: 15px;
   font-family: Arial, sans-serif;
   font-weight: bold;
   text-align: center;
-  margin: 1px 0;
-  padding: 4px; /* puede ser sin padding*/
+  margin: 2px 0;
+  padding: 3px;
+    padding-top: 3px;
+    padding-right: 3px;
+    padding-bottom: 3px;
+    padding-left: 3px;
   background-color: #fc3;
-  line-height: 1.5;
+  line-height: 1.4;
   text-transform: uppercase;
 }
 
 
 .search-box {
-  margin:1%;
+  margin:1px;
   max-height: 44%;
   display: flex;
   flex-direction: column;
@@ -160,26 +165,42 @@
 }
 
 .search-box table {
+  white-space: normal;
   font-size: x-small;
+  table-layout: auto;
   width: 100%;
+  overflow: scroll; /* Habilita el scroll */
+  scrollbar-width: none; /* Para Firefox */
+  -ms-overflow-style: none; /* Para Internet Explorer y Edge heredado */
 }
 
+
+.search-box table::-webkit-scrollbar {
+  display: none; /* Para navegadores basados en WebKit (Chrome, Safari) */
+}
+
+
 .search-box-table {
-  overflow-y: auto; /* Habilita el desplazamiento vertical si es necesario */
+  overflow-y:auto; /* Habilita el desplazamiento vertical si es necesario */
   height: 100%;
   width: 100%;
 }
 
 .search-box table thead th {
   border-bottom: 1.5px solid #007bff;
-  table-layout: fixed;
+  z-index: 1;
+  position: sticky;
+  font-size: small;
+  text-align: center;
+  margin: 0px;
+  top:0;
 }
 
 table thead th {
   position: sticky;
-  font-size: small;
+  font-size: 12px;
   text-align: center;
-  top: 3;
+  top: 0px;
   background-color: #fff; /* Fondo blanco para que destaque */
   z-index: 1; /* Asegura que la cabecera esté por encima de las celdas */
 }
@@ -197,13 +218,13 @@ table thead th {
 .search-section table td {
   border: 1px solid #092C50;
   background-color: #ffffff;
-  height: 30%;
 }
 
 .search-section table th,
 .search-section table td {
-  text-align: left;
-  padding: 1px;
+  text-align:start;
+  padding: 0px;
+  font-size: x-small;
   color: #092C50;
 }
 
@@ -296,10 +317,10 @@ table thead th {
 
 /* Estilo para la tabla de detalles de sala */
 .details-section table {
-  width: 98%;
+  width: 99%;
   border-collapse: collapse;
-  margin-top: 3px;
-  margin-left: 7px;
+  margin-top: 1px;
+  margin-left: 0px;
   color: #092C50;
   font-size: small;
   font-family: Arial, sans-serif;

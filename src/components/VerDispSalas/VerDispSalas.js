@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { addDays, startOfWeek, format } from 'date-fns';
 import './VerDispSalas.css';
-import { fetchSalasConfirmadas } from '../../services/api';
+import { es } from 'date-fns/locale';
+import { FaArrowCircleRight } from "react-icons/fa";
+import { fetchModulos, fetchReservasPorSala,fetchSalasConfirmadas } from '../../services/api';
 
 function VerDisponibilidadSalas() {
   const [salas, setSalas] = useState([]);
+  const [modulos, setModulos] = useState([]);
+  const [reservas, setReservas] = useState([]);
   const [fechaSeleccionada, setFechaSeleccionada] = useState(new Date());
   const [edificioFiltro, setEdificioFiltro] = useState('');
   const [nombreFiltro, setNombreFiltro] = useState('');
@@ -14,16 +18,19 @@ function VerDisponibilidadSalas() {
 
 //FUNCION PARA OBTENER LAS SALAS DE LA BASE DE DATOS
   useEffect(() => {
-    const getSalas= async () => {
+    const cargarDatos= async () => {
       try {
-        const result = await fetchSalasConfirmadas();
-        console.log(result)
-        setSalas(result);
+        const salasData = await fetchSalasConfirmadas();
+        const modulosData = await fetchModulos();
+        const reservasData = await fetchReservasPorSala();
+        setSalas(salasData);
+        setModulos(modulosData);
+        setReservas(reservasData);
       } catch (error) {
-        console.error('Error al obtener las salas:', error);
+        console.error('Error al cargar datos:', error);
       }
     };
-    getSalas();
+    cargarDatos();
   }, []);
 
   //FUNCIÓN PARA FILTRA LAS SALAS SEGÚN LOS CRITERIOS DE BÚSQUEDA
@@ -34,91 +41,113 @@ function VerDisponibilidadSalas() {
   
     const salasFiltradas = salas.filter(sala =>
       (codigoSalaFiltro ? sala.Codigo_sala.toLowerCase().includes(lowerCaseCodigoSalaFiltro) : true) &&
-      (nombreFiltro ? sala.Mombre_sala.toLowerCase().includes(lowerCaseNombreFiltro) : true) &&
-      (edificioFiltro ? sala.Edificio_ID.toLowerCase().includes(lowerCaseEdificioFiltro) : true)
+      (nombreFiltro ? sala.Nombre_sala.toLowerCase().includes(lowerCaseNombreFiltro) : true) &&
+      (edificioFiltro ? sala.Edificio?.Nombre_Edificio.toLowerCase().includes(lowerCaseEdificioFiltro) : true)
     );
     setSalasFiltradas(salasFiltradas);
   };
   
 
   const obtenerFechasDeLaSemana = (fechaBase) => {
-    let fechas = {};
     const inicioSemana = startOfWeek(fechaBase, { weekStartsOn: 1 });
-    for (let i = 0; i < 6; i++) {
-      const fechaDia = addDays(inicioSemana, i);
-      const nombreDia = format(fechaDia, 'EEEE');
-      fechas[nombreDia] = format(fechaDia, 'dd/MM/yyyy');
-    }
-    return fechas;
+    return Array.from({ length: 6 }, (_, i) => addDays(inicioSemana, i)).map((fecha) =>({
+      dia: format(fecha, 'EEEE', { locale: es }),
+      fecha: format(fecha, 'dd/MM/yyyy'), // Formato de fecha para mostrar en la tabla
+      fechaComparacion: format(fecha, 'yyyy-MM-dd'), // Formato de fecha para comparar con las reservas
+    }));
   };
 
   const fechasDeLaSemana = obtenerFechasDeLaSemana(fechaSeleccionada);
 
-  const rangosHorarios = [
-    '08:01 - 08:40', '08:41 - 09:20', '09:31 - 10:10', '10:11 - 10:50',
-    '11:01 - 11:40', '11:41 - 12:20', '12:31 - 13:10', '13:11 - 13:50',
-    '14:01 - 14:40', '14:41 - 15:20', '15:31 - 16:10', '16:11 - 16:50',
-    '17:01 - 17:40', '17:41 - 18:20', '18:21 - 19:00', '19:11 - 19:50',
-    '19:51 - 20:30', '20:41 - 21:20', '21:21 - 22:00', '22:10 - 22:50'
-  ];
-
-
   const renderCabeceraTabla = () => {
-    return (
+    return(
       <tr>
         <th colSpan="2">Módulo</th>
-        {Object.entries(fechasDeLaSemana).map(([dia, fecha]) => (
-          <th key={dia}>{`${dia}`} <br /> {`${fecha}`}</th>
+        {fechasDeLaSemana.map(({dia, fecha}) => (
+          <th key={fecha}>{dia}<br/>{fecha}</th>
         ))}
       </tr>
     );
   };
 
-  
-
   const renderFilasTabla = () => {
-    if (!salaSeleccionada || !salaSeleccionada.dias) {
-      return <tr><td colSpan="8">No hay sala seleccionada o datos disponibles</td></tr>;
+    if (!salaSeleccionada || !modulos || !reservas) {
+      return <tr><td colSpan="8">No hay datos disponibles...</td></tr>;
     }
-
-    const diasDeLaSemana = Object.keys(salaSeleccionada.dias);
-
-    return (
-      <>
-      <p className="titulo-disp-salas">Disponibilidad de Salas</p>
-        {rangosHorarios.map((horario, indexModulo) => (
-          <tr key={indexModulo}>
-            <td>{indexModulo + 1}</td>
-            <td className='colHorario'>{horario}</td>
-            {diasDeLaSemana.map(dia => {
-              const modulo = salaSeleccionada.dias[dia][indexModulo] || {};
-
-              return (
-                <td key={`${dia}-${indexModulo}`}>
-                  {modulo.estado === 'reservado' ? (
-                    <div>
-                      <span><strong>Evento:</strong> {modulo.evento || 'N/A'}</span><br />
-                      <span><strong>Sección:</strong> {modulo.seccion || 'N/A'}</span><br />
-                      <span><strong>Asignatura:</strong> {modulo.asignatura || 'N/A'}</span><br />
-                      <span><strong>Docente:</strong> {modulo.docente || 'N/A'}</span><br />
-                    </div>
-                  ) : (
-                    <div>
-                      <span>Disponible</span>
-                    </div>
-                  )}
-                </td>
-              );
-            })}
-          </tr>
-        ))}
-      </>
-    );
+    return modulos.map((modulo) => (        
+      <tr key={modulo.Numero}>
+        <td className="numero-modulo">{modulo.Numero}</td>
+        <td className="horario-modulo">
+          {format(new Date(`1970-01-01T${modulo.Hora_inicio}`), 'HH:mm')}
+          <br />
+          {format(new Date(`1970-01-01T${modulo.Hora_final}`), 'HH:mm')}
+        </td>
+        {fechasDeLaSemana.map(({fecha,fechaComparacion}) => {          
+          const moduloReservado = salaSeleccionada.dias[fechaComparacion]?.[modulo.Numero - 1];
+           
+          return (
+            <td key={`${fechaComparacion}-${modulo.Numero}`}
+            className={moduloReservado? 'reservado':'disponible'}>
+              {moduloReservado ? (
+                <div>
+                  <span className='detalle'>{moduloReservado.evento}</span>
+                  <span className='info-reserva'>{moduloReservado.seccion}</span>
+                  <span className='info-reserva'>MÓDULOS: {moduloReservado.cantModulos}</span>
+                  <span className='info-reserva'>DOCENTE: {moduloReservado.docente}</span>
+                </div>
+              ) : (
+                <span>Disponible</span>
+              )}
+            </td>
+          );
+        })}
+      </tr>
+    ));
   };
 
-  const handleSelectSala = (sala) => {
-    setSalaSeleccionada(sala);
+
+  const handleSelectSala = async (sala) => {
+    try {
+      // Llamada a la API para obtener las reservas de la sala seleccionada
+      const reservas = await fetchReservasPorSala(sala.ID_Sala);
+      console.log(reservas);
+
+      // Estructura las reservas por día y módulo
+      const diasReservados = {};
+  
+      reservas.forEach((reserva) => {
+        reserva.Modulos.forEach((modulo) => {
+            const fecha = reserva.Fecha; // Fecha de la reserva
+
+            // Inicializar el día si no existe
+            if (!diasReservados[fecha]) {
+              diasReservados[fecha] = [];
+            }
+            // Buscar el docente de la sección
+            const docente = reserva.Examen?.Seccion?.Usuarios?.find(
+              (usuario) => usuario)?.Nombre || 'N/A';
+            
+            // Guardar la reserva en el día y módulo correspondiente
+            diasReservados[fecha][modulo.Numero - 1] = {
+              estado: 'reservado',
+              evento: reserva.Examen?.Nombre_Examen || 'N/A',
+              seccion: reserva.Examen?.Seccion?.Nombre_Seccion || 'N/A',
+              cantModulos: reserva.Examen?.Cantidad_Modulos || 'N/A',
+              docente: docente,
+            };
+        });
+      });
+      console.log('diasReservados',diasReservados, 'Reservas',reservas);
+      setSalaSeleccionada({
+        ...sala,
+        dias: diasReservados,
+      });
+    } catch (error) {
+      console.error('Error al cargar las reservas de la sala:', error);
+      alert('No se pudieron cargar las reservas de la sala seleccionada.');
+    }
   };
+  
 
   return (
     <>
@@ -126,7 +155,7 @@ function VerDisponibilidadSalas() {
       <div className='container-lateral'>
         <div className="search-section">
           <h2>Seleccionar Sala</h2>
-          <div className="search-box" style={{maxHeight:'90%'}}>
+          <div className="search-box" style={{maxHeight:'45%'}}>
             <input 
               type="date" 
               value={format(fechaSeleccionada, 'yyyy-MM-dd')} 
@@ -150,15 +179,17 @@ function VerDisponibilidadSalas() {
               value={codigoSalaFiltro}
               onChange={(e) => setCodigoSalaFiltro(e.target.value)}
             />
-            <button onClick={filtrarSalas}>Buscar</button> {/* Botón de búsqueda */}
-            <div className="search-box-table">
+            <button onClick={filtrarSalas}>Buscar</button> {/* Botón de búsqueda */}  
+          </div>
+          <div className='search-box' style={{maxHeight:'73%'}}>
+            <div className='search-box-table'>
               <table>
                 <thead>
                   <tr>
-                    <th>cod. Sala</th>
+                    <th>Cód.</th>
                     <th>Nombre</th>
                     <th>Edificio</th>
-                    <th>  </th>
+                    <th></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -168,35 +199,36 @@ function VerDisponibilidadSalas() {
                       <td>{sala.Nombre_sala}</td>
                       <td>{sala.Edificio.Nombre_Edificio}</td>
                       <td>
-                        <button 
-                          onClick={() => handleSelectSala(sala)} 
-                          className={`imagenb ${salaSeleccionada === sala ? 'imagen-seleccionada' : ''}`}>
-                          <img className="imagen-boton" src="sel.png" alt="Seleccionar" />
-                        </button>
+                        <FaArrowCircleRight
+                          className={`icono ${salaSeleccionada === sala ? 'seleccionado' : ''}`} 
+                          onClick={() => handleSelectSala(sala)}
+                        />
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-          </div>  
-        </div>
+          </div>
+        </div>  
       </div>
         
-      <div className="details-section" style={{ marginTop: '3px' }}>
-        {salaSeleccionada && (
-          <table>
-            <thead>
-              <tr>
-                <th colSpan={8}>{`Sala ${salaSeleccionada.codigo} - ${salaSeleccionada.nombre} (${salaSeleccionada.capacidad}) - ${salaSeleccionada.edificio}`}</th>
-              </tr>
-              {renderCabeceraTabla()}
-            </thead>
-            <tbody>
-              {renderFilasTabla()}
-            </tbody>
-          </table>
-        )}
+      <div className="details-section">
+        <div className="details-section-table">
+          {salaSeleccionada && (
+            <table>
+              <thead>
+                <tr>
+                  <th colSpan={8}><h2>{`Sala ${salaSeleccionada.Nombre_sala}`}</h2></th>
+                </tr>
+                {renderCabeceraTabla()}
+              </thead>
+              <tbody>
+                {renderFilasTabla()}
+              </tbody>
+            </table>
+          )}
+        </div>
       </div> 
     </>
   );

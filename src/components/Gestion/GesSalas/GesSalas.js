@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaEdit,FaTrash } from 'react-icons/fa';
-import * as XLSX from 'xlsx';
 import './GesSalas.css';
 import { fetchSalasConfirmadas, guardarSala,deleteSalaInAPI, fetchEdicicio } from '../../../services/api';
 
 function GesSalas() {
-  const [salas, setSalas] = useState([]);
+  const [salas] = useState([]);
   const [salasConfirmadas, setSalasConfirmadas] = useState([]);
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
@@ -55,54 +54,6 @@ function GesSalas() {
   //EDITAR SALA- SE ABRE VENTANA PARA EDITAR SALA
   const handleEdit = (ID_Sala) => {
     navigate(`/EditarSala/${ID_Sala}`);
-  };
-
-  //SUBIR ARCHIVO DE EXCEL, SE PREVISUALIZAN LAS SALAS ANTES DE GUARDARLAS
-  const handleFileUpload = (e) => {
-    const file = e.target.files[0];
-    if (!file) {
-      alert("Por favor selecciona un archivo válido.");
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const data = new Uint8Array(event.target.result);
-      const workbook = XLSX.read(data, { type: 'array' });
-      const sheetName = workbook.SheetNames[0];
-      const worksheet = workbook.Sheets[sheetName];
-      const jsonData = XLSX.utils.sheet_to_json(worksheet);
-
-      console.log('Datos leídos del archivo:', jsonData); 
-
-      if (jsonData.length === 0 || Object.keys(jsonData[0]).length !== 5) {
-        alert("El archivo no tiene el formato correcto.");
-        return;
-      }
-      const salasCargadas = jsonData.map((row, index) => {
-        // Encuentra el ID_Edificio correspondiente al Nombre_Edificio
-        const edificio = edificios.find(
-          (edificio) => edificio.Nombre_Edificio === row['Edificio']
-        );
-  
-        if (!edificio) {
-          alert(`El edificio "${row['Edificio']}" no existe en la base de datos.`);
-          return null; // Si el edificio no existe, no incluir esta sala
-        }
-  
-        return {
-          ID_Sala: index + 1,
-          Codigo_sala: row['codigo_sala'],
-          Nombre_sala: row['nombre_sala'],
-          Capacidad: row['capacidad'],
-          ID_Edificio: edificio.ID_Edificio, // Usamos el ID encontrado
-          ID_Estado: 1, // Valor predeterminado
-        };
-      }).filter((sala) => sala !== null); // Filtrar salas inválidas
-  
-      setSalas(salasCargadas);
-    };
-    reader.readAsArrayBuffer(file);
   };
 
   //GUARDA LAS SALAS QUE SE CARGARON EN EL ARCHIVO EN LA BASE DE DATOS
@@ -163,8 +114,7 @@ function GesSalas() {
     sala.Codigo_sala.toLowerCase().includes(searchTerm.toLowerCase()) ||
     sala.Nombre_sala.toLowerCase().includes(searchTerm.toLowerCase()) ||
     sala.Capacidad.toString().includes(searchTerm) ||
-    sala.ID_Edificio.toString().toLowerCase().includes(searchTerm.toLowerCase()),
-    console.log('salas confirmadas para filtrar',salasConfirmadas)
+    sala.Edificio?.Nombre_Edificio.toString().toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   return (
@@ -220,12 +170,7 @@ function GesSalas() {
           <h2>Carga Masiva de Salas</h2>
           <div className='search-box'>
             <input
-              className="file-input"
-              type="file"
-              onChange={handleFileUpload}
-              accept=".xls, .xlsx"
-              id="file-upload"
-              style={{ display: 'none' }} // Oculta el input original
+            
             />
             <button>
               <label htmlFor="file-upload" className="custom-file-upload">

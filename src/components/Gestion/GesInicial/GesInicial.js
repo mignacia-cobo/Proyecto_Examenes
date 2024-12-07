@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { FiEye } from "react-icons/fi";
+import './GesInicial.css';
 import { uploadFile, confirmUpload }  from '../../../services/api';
 
 const FileUpload = () => {
@@ -34,7 +36,7 @@ const FileUpload = () => {
 
   return (
     <>
-        <p className='titulo'>Cargar Archivo Excel</p>
+        <p className='titulo'>Carga Inicial de Datos</p>
         <div className='container-lateral'>
             <div className='search-section'>
                 <h2>Subir Archivo</h2>
@@ -47,16 +49,26 @@ const FileUpload = () => {
         <div className='details-section'>
             {previewData.length > 0 && (
                 <div className='details-section-table'>
-                    <div className='details-section-content'>
-                        <h3>Previsualización de Datos</h3>
-                    </div>
                     <div className='details-section-content'style={{overflowY:'auto'}}>
                         <table style={{overflowY:'auto'}}>
                             <thead>
                             <tr>
+                              <th colSpan={13}><h2>Carga Masiva Inicial</h2></th>
+                            </tr>
+                            <tr>	
                                 <th>Escuela</th>
+                                <th>Carrera</th>
                                 <th>Jornada</th>
+                                <th>Nivel</th>
+                                <th>Sección</th>
                                 <th>Asignatura</th>
+                                <th>Procesamiento</th>
+                                <th>Plataforma</th>
+                                <th>Inscritos</th>
+                                <th>Módulos</th>
+                                <th>Docente</th>
+                                <th>S. Evaluativa</th>
+                                <th>Ver</th>
                                 {/* Otras columnas */}
                             </tr>
                             </thead>
@@ -64,8 +76,18 @@ const FileUpload = () => {
                             {previewData.map((row, index) => (
                                 <tr key={index}>
                                 <td>{row.escuela}</td>
+                                <td>{row.carrera}</td>
                                 <td>{row.jornada}</td>
+                                <td>{row.nivel}</td>
+                                <td>{row.seccion}</td>
                                 <td>{row.asignatura}</td>
+                                <td>{row.tipoProcesamiento}</td>
+                                <td>{row.plataformaProcesamiento}</td>
+                                <td>{row.inscritos}</td>
+                                <td>{row.tiempoAsignado}</td>
+                                <td>{row.docente}</td>
+                                <td>{row.situacionEvaluativa}</td>
+                                <td><FiEye /></td>
                                 {/* Otros datos */}
                                 </tr>
                             ))}

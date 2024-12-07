@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaEdit, FaTrash } from 'react-icons/fa';
-import * as XLSX from 'xlsx';
 import './GesModulos.css';
 import { fetchModulos, eliminarModuloAPI, guardarModuloAPI } from '../../../services/api';
 
 
 function GesModulos () {
     const [modulos, setModulos] = useState([]);
-    const [modulosConfirmados, setModulosConfirmados] = useState([]);
+    const [modulosConfirmados] = useState([]);
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
     const [newModulo, setNewModulo] = useState({
@@ -68,60 +67,7 @@ function GesModulos () {
             console.error('Error al agregar el módulo:', error);
         }
     };
-    // MANEJAR CARGA DE ARCHIVOS
-    // Manejar la carga del archivo Excel y previsualizar los módulos
-    const handleFileUploadModulos = (e) => {
-        const file = e.target.files[0];
-        if (!file) {
-        alert("Por favor, selecciona un archivo válido.");
-        return;
-        }
     
-        const reader = new FileReader();
-        reader.onload = (event) => {
-        const data = new Uint8Array(event.target.result);
-        const workbook = XLSX.read(data, { type: 'array' });
-        const sheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[sheetName];
-        const jsonData = XLSX.utils.sheet_to_json(worksheet);
-    
-        console.log('Datos leídos del archivo:', jsonData);
-    
-        // Validar que el archivo tenga el formato correcto
-        const requiredColumns = ['Numero', 'Hora_Inicio', 'Hora_Final'];
-        const missingColumns = requiredColumns.filter(col => !jsonData[0].hasOwnProperty(col));
-    
-        if (missingColumns.length > 0) {
-            alert(`El archivo no tiene el formato correcto. Faltan las columnas: ${missingColumns.join(', ')}`);
-            return;
-        }
-    
-        // Convierte un valor decimal de hora a formato HH:mm:ss
-        const convertirHoraExcel = (horaDecimal) => {
-            const totalSegundos = Math.round(horaDecimal * 24 * 3600); // Total de segundos en el día
-            const horas = Math.floor(totalSegundos / 3600); // Horas completas
-            const minutos = Math.floor((totalSegundos % 3600) / 60); // Minutos restantes
-        
-            // Formatear a HH:mm:ss
-            return [
-            String(horas).padStart(2, '0'),
-            String(minutos).padStart(2, '0'),
-            ].join(':');
-        };
-  
-        const modulosCargados = jsonData.map((row, index) => {
-            return {
-              Numero: row['Numero'],
-              Hora_inicio: convertirHoraExcel(row['Hora_Inicio']), // Conversión
-              Hora_final: convertirHoraExcel(row['Hora_Final']), // Conversión
-              ID_Estado: 1 // Valor predeterminado
-            };
-        });
-            console.log('Módulos cargados:', modulosCargados);
-        setModulosConfirmados(modulosCargados);
-        };
-        reader.readAsArrayBuffer(file);
-    };
 
     const handleConfirmarModulos = async () => {
         try {
@@ -198,12 +144,6 @@ function GesModulos () {
                 <h2>Carga Masiva de Módulos</h2>
                 <div className='search-box'>
                     <input
-                    className="file-input"
-                    type="file"
-                    onChange={handleFileUploadModulos}
-                    accept=".xls, .xlsx"
-                    id="file-upload"
-                    style={{ display: 'none' }}
                     />
                     <button>
                         <label htmlFor="file-upload" className="custom-file-upload">Examinar</label>

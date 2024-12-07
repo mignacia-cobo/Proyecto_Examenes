@@ -8,16 +8,31 @@ const port = 3000;
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+//app.use(express.json());
+// Middleware para aumentar el límite de la solicitud
+app.use(express.json({ limit: '100mb' })); // Cambia el límite según lo necesites
+app.use(express.urlencoded({ extended: true, limit: '100mb' }));
 
 // Función para inicializar la aplicación
 const iniciarServidor = async () => {
   try {
+    
     // Conectar a la base de datos
     await conectarDB();
 
     // Sincronizar la base de datos
-    await sequelize.sync({ alter: true }); // Usa `alter` para evitar borrar datos existentes
+    await sequelize.sync({ alter: true }) // Usa `alter` para evitar borrar datos existentes
+    .then(() => console.log("Base de datos sincronizada correctamente."))
+    .catch((err) => console.error("Error al sincronizar la base de datos:", err));
+
+    sequelize.getQueryInterface().showAllSchemas()
+    .then((tables) => {
+      console.log("Tablas en la base de datos:", tables);
+    })
+    .catch((err) => {
+      console.error("Error al obtener las tablas:", err);
+    });
+
 
     // Inicializar valores por defecto
     await inicializarBaseDeDatos();

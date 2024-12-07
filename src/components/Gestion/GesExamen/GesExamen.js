@@ -1,137 +1,95 @@
 import React, { useState, useEffect } from 'react';
-import * as XLSX from 'xlsx';
+import { fetchExamenes }  from '../../../services/api';
+import { IoIosAlbums } from "react-icons/io";
 import './GesExamen.css';
 
-
-function GesExamen() {
-
-        const [examenes, setExamenes] = useState([]);
-        const [examenesConfirmados, setExamenesConfirmados] = useState([]);
+const GesExamen = () => {
+    const [examenes, setExamenes] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState('');
     
-        const handleFileUpload = (e) => {
-            const file = e.target.files[0];
-            const reader = new FileReader();
-    
-            reader.onload = (evt) => {
-                const bstr = evt.target.result;
-                const wb = XLSX.read(bstr, { type: 'binary' });
-                const wsname = wb.SheetNames[0];
-                const ws = wb.Sheets[wsname];
-                const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
-    
-                const examenesCargados = data.slice(1).map((row) => ({
-                    id: row[0],
-                    evento:row[1],
-                    seccion:row[2],
-                    asignatura: row[3],
-                    cantModulos: row[4],
-                    docente: row[5]
-                }));
-    
-                setExamenes(examenesCargados);
-            };
-    
-            reader.readAsBinaryString(file);
+    useEffect(() => {
+        const loadExamenes = async () => {
+        try {
+            const data = await fetchExamenes();
+            setExamenes(data);
+            setLoading(false);
+        } catch (error) {
+            console.error("Error al cargar los exámenes:", error);
+            setLoading(false);
+        }
         };
+        loadExamenes();
+    }, []);
     
-
-        const confirmarExamenes = () => {
-            const examenesParaGuardar = examenes.map(examen => ({
-              ...examen,
-              reservado: false // Inicialmente ningún examen está reservado
-            }));
-          
-            setExamenesConfirmados(examenesParaGuardar);
-            localStorage.setItem('examenesConfirmados', JSON.stringify(examenesParaGuardar));
-            alert('Examenes confirmados con éxito.');
-          };
-
-        useEffect(() => {
-            const examenesGuardados = localStorage.getItem('examenesConfirmados');
-            if (examenesGuardados) {
-                setExamenesConfirmados(JSON.parse(examenesGuardados));
-            }
-        }, []);
-
-        const handleRemoveExamenesConfirmados = () => {
-            localStorage.removeItem('examenesConfirmados');
-            //Para el botón eliminar examenes confirmados
-        };
-    
-        return (
-            <>
-            <p class="titulo">Gestión de Exámenes</p>
-            <div className='carga-masiva-container'>
-                <h1>Carga Masiva de Exámenes</h1>
-                <button onClick={handleRemoveExamenesConfirmados} className="btn">
-                <img className="imagen-boton" src="eliminar.png" alt="Eliminar" />
-                </button>
-                <input type="file" onChange={handleFileUpload} accept=".xls, .xlsx" />
-                
-                {examenes.length > 0 && (
-                    <>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Evento</th>
-                                    <th>Sección</th>
-                                    <th>Asignatura</th>
-                                    <th>Módulos</th>
-                                    <th>Docente</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {examenes.map((examen, index) => (
-                                    <tr key={index}>
-                                        <td>{examen.id}</td>
-                                        <td>{examen.evento}</td>
-                                        <td>{examen.seccion}</td>
-                                        <td>{examen.asignatura}</td>
-                                        <td>{examen.cantModulos}</td>
-                                        <td>{examen.docente}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                            <button onClick={confirmarExamenes}>Confirmar Examenes</button>
-                        </table>
-                        
-                    </>
-                )}
-    
-                {examenesConfirmados.length > 0 && (
-                    <>
-                        <h2>Exámenes Confirmados</h2>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Evento</th>
-                                    <th>Sección</th>
-                                    <th>Asignatura</th>
-                                    <th>Módulos</th>
-                                    <th>Docente</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {examenesConfirmados.map((examen, index) => (
-                                    <tr key={index}>
-                                        <td>{examen.id}</td>
-                                        <td>{examen.evento}</td>
-                                        <td>{examen.seccion}</td>
-                                        <td>{examen.asignatura}</td>
-                                        <td>{examen.cantModulos}</td>
-                                        <td>{examen.docente}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </>
-                )}
-            </div>
-            </>
-        );
+    if (loading) {
+        return <p>Cargando exámenes...</p>;
     }
+    
+    const handleSearch = (e) => {
+        setSearchTerm(e.target.value);
+    };
+      
+    //FILTRAR EXAMEN
+    const filteredExamene = examenes?.filter(examen =>
+    examen.Nombre_Examen.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    examen.Seccion.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    examen.Estado.Nombre.toLowerCase().includes(searchTerm.toLowerCase()),
+    );
+    
+    return (
+        <>
+            <p className='titulo'>Gestión de Exámenes</p>
+            <div className='container-lateral'>
+                <div className="search-section">
+                    <h2>Buscar Examen</h2>
+                    <div className="search-box">
+                        <input
+                        type='search'
+                        placeholder='Buscar...'
+                        value={searchTerm}
+                        onChange={handleSearch}
+                        />
+                    </div>
+                </div>
+            </div>
+            <div className='details-section'>
+                <div className='details-section-table'>
+                    {filteredExamene.length > 0 && (
+                    <table>
+                        <thead>
+                        <tr>
+                            <th colSpan={7}><h2>Exámenes Registrados</h2></th>
+                        </tr>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Sección</th>
+                            <th>Módulos</th>
+                            <th>Inscritos</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {filteredExamene.map((examen) => (
+                            <tr key={examen.ID_Examen}>
+                            <td>{examen.ID_Examen}</td>
+                            <td>{examen.Nombre_Examen}</td>
+                            <td>{examen.Seccion?.Nombre_Seccion}</td>
+                            <td>{examen.Cantidad_Modulos}</td>
+                            <td>{examen.Inscritos}</td>
+                            <td>{examen.Estado?.Nombre === 'Examen_Reservado'? 'Reservado':'Pendiente'}</td>
+                            <td><IoIosAlbums/></td>
+                            </tr>
+                        ))}
+                        </tbody>
+                    </table>
+                    )}
+                </div>
+            </div>
+        </>
+    );
+};
 
 export default GesExamen;
-

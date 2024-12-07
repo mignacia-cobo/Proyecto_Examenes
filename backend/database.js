@@ -1,10 +1,11 @@
 const { Sequelize } = require('sequelize');
-const { Estado, Sede, Edificio, Modulo} = require('./models/Models');
+const { sequelize,Estado, Sede, Edificio, Modulo,Rol} = require('./models/Models');
 
-const sequelize = new Sequelize({
-  dialect: 'sqlite',
-  storage: './database.sqlite'
-});
+//const sequelize = new Sequelize({
+  //dialect: 'sqlite',
+  //storage: './database.sqlite',
+  //logging: console.log,
+//});
 
 
 const conectarDB = async () => {
@@ -16,6 +17,8 @@ const conectarDB = async () => {
       process.exit(1);
     }
   };
+
+  
 
   const inicializarBaseDeDatos = async () => {
     try {
@@ -36,6 +39,24 @@ const conectarDB = async () => {
       }
       console.log('Estados iniciales insertados.');
   
+      // Valores por defecto para `Rol`
+      const roles = [
+        { ID_Rol: 0, Nombre: 'Alumno' },
+        { ID_Rol: 1, Nombre: 'Docente' },
+        { ID_Rol: 2, Nombre: 'Admnistrativo' },
+        { ID_Rol: 3, Nombre: 'Coordinador' },
+        { ID_Rol: 4, Nombre: 'Admin' },
+      ];
+  
+      for (const rol of roles) {
+        await Rol.findOrCreate({
+          where: { ID_Rol: rol.ID_Rol },
+          defaults: { Nombre: rol.Nombre },
+        });
+      }
+      console.log('Roles iniciales insertados.');
+  
+
       // Valores por defecto para `Sede`
       const sedes = [
         { ID_Sede: 1, Nombre_Sede: 'Valparaíso' },

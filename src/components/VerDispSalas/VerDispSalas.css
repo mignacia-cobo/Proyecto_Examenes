@@ -1,0 +1,100 @@
+/* Estilo para las celdas de número de módulo */
+td.numero-modulo {
+    background-color: #ffffff; /* Blanco */
+    font-weight: bold;
+    text-align: center;
+    font-size: 16px;
+    color: #000000; /* Negro */
+  }
+  
+  /* Estilo para las celdas de horario */
+  td.horario-modulo {
+    background-color: #f6f8ffc1; /* Gris claro */
+    font-style: italic;
+    text-align: center;
+    font-size: 14px;
+    color: #333333; /* Gris oscuro */
+  }
+  h2{
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+/* Estilo general para la tabla */
+table {
+    text-align: center;
+  }
+  
+  /* Encabezado de la tabla */
+  table th {
+    background-color: #003366;
+    color: #ffffff;
+    padding: 10px;
+    border: 1px solid #cccccc;
+    text-transform: uppercase;
+  }
+
+  /* Celdas */
+  table td {
+    padding: 10px;
+    border: 1px solid #cccccc;
+  }
+  
+  /* Estilo para las celdas con reservas */
+  td.reservado {
+    background-color: #fdd77759;
+    color: #333333;
+    font-weight:bolder;
+    min-width: 130px;
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow:ellipsis;
+    white-space:collapse;
+  }
+  
+  /* Estilo para las celdas disponibles */
+  td.disponible {
+    background-color: #dff0d8;
+    color: #2b532b;
+    font-size: 12px;
+    font-style: italic;
+    min-width: 130px;
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: collapse;
+  }
+  
+  /* Información adicional dentro de las celdas */
+  td .info-reserva {
+    font-size: 10px;
+    color: #555555;
+    text-align: center;
+    margin-top: 3px;
+    display: block;
+  }
+  
+  /* Estilo para los detalles como nombre de la asignatura o sección */
+  table td .detalle {
+    font-weight: bold;
+    font-size: 12px;
+  }
+  
+  /* Hover para las filas */
+  /*table tr:hover {
+    background-color: #e0e4f4de;
+  }*/
+  table td {
+    transition: background-color 0.3s ease; /* Transición suave */
+  }
+  
+  table td:hover {
+    background-color: #dfe1ed62;
+  }
+  
+  
+  /* Ajuste de texto */
+  table td span {
+    display: block;
+    margin: 1px 0;
+    text-align: center;
+  }

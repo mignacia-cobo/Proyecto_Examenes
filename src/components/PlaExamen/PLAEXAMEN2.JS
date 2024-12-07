@@ -1,6 +1,5 @@
 import React, { useState, useEffect  } from 'react';
 /* import { addDays } from 'date-fns'; */
-import Tooltip from 'react-tooltip-lite'; // Si decides usar una biblioteca como react-tooltip-lite
 import { addDays, startOfWeek, eachDayOfInterval, format } from 'date-fns';
 /* import { startOfWeek, eachDayOfInterval, format } from 'date-fns'; */
 import './PlaExamen.css';

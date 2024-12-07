@@ -147,6 +147,28 @@ export const fetchExamenes = async () => {
   }
 };
 
+//Obtener alumnos
+export const fetchAlumnos = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/alumnos/todo`);
+    return response.data;
+  } catch (error) {
+    console.error('Error al obtener los alumnos:', error);
+    throw error;
+  }
+};
+
+//Obtener docentes
+export const fetchDocentes = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/docentes/todo`);
+    return response.data;
+  } catch (error) {
+    console.error('Error al obtener los docentes:', error);
+    throw error;
+  }
+};
+
 // Crear reserva
 export const crearReserva = async (reserva) => {
   try {
@@ -179,6 +201,17 @@ export const fetchReservasPorFecha = async (fecha) => {
     throw error;
   }
 };
+
+//OBETENER RESERVAS POR SALA
+export const fetchReservasPorSala = async (ID_Sala) => {
+  try {
+    const response = await axios.get(`${API_URL}/reservas/sala/${ID_Sala}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error al obtener reservas por sala:', error);
+    throw error;
+  }
+}
 
 // Función para obtener todas las reservas
 export const fetchReservas = async () => {
@@ -229,6 +262,80 @@ export const confirmUpload = async (data) => {
   try {
     const response = await axios.post(`${API_URL}/archivo/confirmar`, { datos: data });
     return response.data;
+  } catch (error) {
+    console.error('Error al confirmar la carga de datos:', error);
+    throw error;
+  }
+};
+
+// Subir archivo Excel con los alumnos
+export const uploadFileAlumnos = async (file) => {
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await axios.post(`${API_URL}/alumnos/upload`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+      maxContentLength: Infinity, // Sin límite para el contenido
+      maxBodyLength: Infinity, // Sin límite para el tamaño del cuerpo 
+    });
+
+    // Retorna los datos procesados para previsualización
+    return response.data;
+  } catch (error) {
+    console.error('Error al subir el archivo:', error);
+    throw error;
+  }
+};
+
+// Confirmar carga de datos procesados alumnos
+export const confirmUploadAlumnos = async (data) => {
+  try {
+    const response = await axios.post(`${API_URL}/alumnos/confirmar`, { datos: data,
+      maxContentLength: Infinity, // Sin límite para el contenido
+      maxBodyLength: Infinity, // Sin límite para el tamaño del cuerpo 
+    });
+    return response.data;
+
+  } catch (error) {
+    console.error('Error al confirmar la carga de datos:', error);
+    throw error;
+  }
+};
+
+// Subir archivo Excel con los docentes
+export const uploadFileDocentes = async (file) => {
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await axios.post(`${API_URL}/docentes/upload`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+      maxContentLength: Infinity, // Sin límite para el contenido
+      maxBodyLength: Infinity, // Sin límite para el tamaño del cuerpo 
+    });
+
+    // Retorna los datos procesados para previsualización
+    return response.data;
+  } catch (error) {
+    console.error('Error al subir el archivo:', error);
+    throw error;
+  }
+};
+
+// Confirmar carga de datos procesados docentes
+export const confirmUploadDocentes = async (data) => {
+  try {
+    const response = await axios.post(`${API_URL}/docentes/confirmar`, { datos: data,
+      maxContentLength: Infinity, // Sin límite para el contenido
+      maxBodyLength: Infinity, // Sin límite para el tamaño del cuerpo 
+    });
+    return response.data;
+
   } catch (error) {
     console.error('Error al confirmar la carga de datos:', error);
     throw error;

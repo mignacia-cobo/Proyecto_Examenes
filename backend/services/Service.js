@@ -1,5 +1,93 @@
 // services.js
-const { Jornada,Sede, Edificio, Escuela, Usuario, Modulo, Carrera, Estado, Sala, Rol, Reserva, Asignatura, Examen , ReservaModulo, CarreraJornada } = require('../models/Models');
+const { Sequelize, DataTypes } = require('sequelize');
+const sequelize = new Sequelize({
+  dialect: 'sqlite',
+  storage: './database.sqlite',
+  logging: console.log
+});
+
+const { Jornada,Sede, Edificio, Escuela, Usuario, Modulo, Carrera, Estado, Sala, Rol, Reserva, Asignatura, Examen , ReservaModulo, CarreraJornada, Seccion, UsuarioSeccion} = require('../models/Models');
+
+//CARGAR ALUMNOS
+const insertarAlumnosMasivamente = async (datos) => {
+  try {
+    for (const row of datos) {
+      if (!row.rut || !row.nombre || !row.seccion) {
+        throw new Error(`Datos incompletos: ${JSON.stringify(row)}`);
+      }
+      // Buscar la sección correspondiente
+      const seccion = await Seccion.findOne({ where: { Nombre_Seccion: row.seccion } });
+      if (!seccion) {
+        console.warn(`La sección ${row.seccion} no existe. El usuario ${row.rut} no será agregado.`);
+        continue; // Ignorar este usuario y pasar al siguiente
+      }
+      // Crear o encontrar el usuario
+      const [usuario] = await Usuario.findOrCreate({
+        where: { Rut: row.rut }, // Buscar duplicados por RUT
+        defaults: {
+          Username: row.user,
+          Password: row.pass,
+          Nombre: row.nombre,
+          Rut: row.rut,
+          Email: row.email,
+          ID_Rol: 0, // Rol predeterminado para alumnos
+          ID_Estado: 1, // Estado predeterminado (Activo)
+        },
+      });
+      await UsuarioSeccion.findOrCreate({
+        where: {
+          ID_Usuario: usuario.ID_Usuario,
+          ID_Seccion: seccion.ID_Seccion,
+        },
+      });
+    }
+    return { message: 'Usuarios cargados con éxito.' };
+  } catch (error) {
+    console.error('Error al insertar usuarios:', error);
+    throw new Error('Error al insertar usuarios: ' + error.message);
+  }
+};
+
+//CARGAR DOCENTES
+const insertarDocentesMasivamente = async (datos) => {
+  try {
+    for (const row of datos) {
+      if (!row.rut || !row.nombre) {
+        throw new Error(`Datos incompletos: ${JSON.stringify(row)}`);
+      }
+      // Busca al usuario por su RUT
+      const usuarioExistente = await Usuario.findOne({ where: { Nombre: row.nombre } });
+  
+      if (usuarioExistente) {
+        // Si el usuario ya existe, lo actualiza
+        await usuarioExistente.update({
+          Username: row.user,
+          Password: row.pass,
+          Rut: row.rut,
+          Email: row.email,
+          ID_Rol: 1, // Rol predeterminado para docentes
+          ID_Estado: 1, // Estado predeterminado (Activo)
+        });
+        
+      } else {
+        // Si el usuario no existe, lo crea
+        const nuevoUsuario = await Usuario.create({
+          Username: row.user,
+          Password: row.pass,
+          Nombre: row.nombre,
+          Rut: row.rut,
+          Email: row.email,
+          ID_Rol: 1, // Rol predeterminado para docentes
+          ID_Estado: 1, // Estado predeterminado (Activo)
+        });
+      }
+    }
+    return { message: 'Usuarios cargados con éxito.' };
+  } catch (error) {
+    console.error('Error en upsertUsuario:', error);
+    throw new Error('Error al insertar o actualizar el usuario');
+  }
+};
 
 //CARGA MASIVA INICIAL
 // Servicio para procesar y cargar datos del archivo Excel
@@ -28,7 +116,7 @@ const insertarDatosDesdeArchivo = async (datos) => {
         where: { Nombre_Asignatura: row.asignatura },
         defaults: { Nivel: row.nivel, ID_Carrera: carrera.ID_Carrera },
       });
-      //Insertar en tabla CarreraJornada
+
       // Insertar en tabla CarreraJornada
       await CarreraJornada.findOrCreate({
         where: { 
@@ -37,17 +125,57 @@ const insertarDatosDesdeArchivo = async (datos) => {
         },
       });
 
+      // Insertar en tabla Sección
+      const [seccion] = await Seccion.findOrCreate({
+        where: { Nombre_Seccion: row.seccion },
+        defaults: {
+          ID_Asignatura: asignatura.ID_Asignatura,
+          ID_Jornada: jornada.ID_Jornada,
+        },
+      });
+
+      // Insertar en tabla Usuario
+      const [usuario] = await Usuario.findOrCreate({
+        where: { Nombre: row.docente },
+        defaults: {
+          Username: '', // Opcional, vacío
+          Password: '1234', // Opcional, vacío
+          Nombre: row.docente,
+          Rut: '', // Opcional, vacío
+          Email: '', // Opcional, vacío
+          ID_Rol: 1, // Docente
+          ID_Estado: 1, // Activo
+          //Telefono: '', // Opcional, vacío
+        },
+      });
+
+      // Insertar en tabla UsuarioSeccion
+      await UsuarioSeccion.findOrCreate({
+        where: {
+          ID_Seccion: seccion.ID_Seccion,
+          ID_Usuario: usuario.ID_Usuario,
+        },
+      });
+
+      // Insertar en tabla CarreraJornada
+      await CarreraJornada.findOrCreate({
+        where: {
+          ID_Carrera: carrera.ID_Carrera,
+          ID_Jornada: jornada.ID_Jornada,
+        },
+      });
+
       // Insertar en tabla Examen
       await Examen.create({
         Nombre_Examen: row.asignatura,
         ID_Asignatura: asignatura.ID_Asignatura,
-        Seccion: row.seccion,
+        ID_Seccion: seccion.ID_Seccion,
         Inscritos: row.inscritos,
         Tipo_Procesamiento: row.tipoProcesamiento,
         Plataforma_Procesamiento: row.plataformaProcesamiento,
         Situacion_Evaluativa: row.situacionEvaluativa,
         Cantidad_Modulos: row.tiempoAsignado,
-        ID_Estado: 4,
+        ID_Estado: 4, // Asumimos 4 como estado por defecto
       });
     }
 
@@ -58,6 +186,7 @@ const insertarDatosDesdeArchivo = async (datos) => {
     throw new Error("Error al insertar los datos");
   }
 };
+
 
 //ACTUALIZAR ESTADO DE UNA SALA AL SELECCIONARLA PARA RESERVAR
 const actualizarEstadoSala = async (ID_Sala, ID_Estado) => {
@@ -159,11 +288,54 @@ const obtenerExamenes = async () => {
           model: Asignatura,
           attributes: ['Nombre_Asignatura'], // Solo devuelve el nombre de la asignatura
         },
+        {
+          model: Seccion,
+          attributes: ['Nombre_Seccion'], // Solo devuelve el nombre de la sección
+        },
+        {
+          model: Estado,
+          attributes: ['Nombre'], // Solo devuelve el nombre del estado
+        }
       ],
     });
     return examenes;
   } catch (error) {
     console.error('Error al obtener exámenes:', error);
+    throw error;
+  }
+};
+
+//Obtener Alumnos
+const obtenerAlumnos = async () => {
+  try {
+    const alumnos = await Usuario.findAll({
+      where: { ID_Rol: 0 }, // Filtrar por rol de alumnos
+    });
+    return alumnos;
+  } catch (error) {
+    console.error('Error al obtener los alumnos:', error);
+    throw error;
+  }
+};
+
+//Obtener Docentes
+const obtenerDocentes = async () => {
+  try {
+    const docentes = await Usuario.findAll({
+      where: {
+        ID_Rol: 1,
+        [Sequelize.Op.and]: [
+          Sequelize.where( // Filtrar por RUT válido
+            Sequelize.fn('LENGTH', Sequelize.col('Rut')), // Obtener la longitud del RUT
+            { [Sequelize.Op.gt]: 2 } // Rut debe tener más de 2 caracteres
+          ),
+          { Rut: { [Sequelize.Op.ne]: null } } // Excluir nulos
+        ]
+      }
+    });
+    return docentes;
+  } catch (error) {
+    console.error('Error al obtener los docentes:', error);
     throw error;
   }
 };
@@ -192,14 +364,83 @@ const obtenerReservasPorFecha = async (Fecha) => {
   });
 };
 
+//OBETENER RESERVAS POR SALA
+const obtenerReservasPorSala = async (id) => {
+  try  {
+    if (!id) {
+      throw new Error('El ID_Sala proporcionado es inválido o está vacío.');
+    }
+    const reservas = await Reserva.findAll({
+      where: { ID_Sala: id },
+      include: [
+        {
+          model: Modulo,
+          through: { attributes: [] },
+          attributes: ['ID_Modulo', 'Numero', 'Hora_inicio', 'Hora_final'],
+        },
+        {
+          model: Examen,
+          attributes: ['Nombre_Examen',  'Cantidad_Modulos'],
+          include: [
+            {
+              model: Asignatura,
+              attributes: ['Nombre_Asignatura'],
+            },
+            {
+              model: Seccion,
+              attributes: ['Nombre_Seccion'],
+              include: [
+                  {
+                    model: Usuario,
+                    through: UsuarioSeccion,
+                    attributes: ['Nombre', 'Rut', 'Email'],
+                    where: { ID_Rol: 1 }, // Filtrar usuarios con rol 1
+                  }
+              ],
+            },
+          ],
+        },
+      ],
+    });
+    return reservas;
+  } catch (error) {
+    console.error('Error al obtener reservas por sala:', error);
+    throw new Error('Error al obtener las reservas por sala');
+  }
+};
+
 // Obtener todas las reservas
 const obtenerReservas = async () => {
   try {
     const reservas = await Reserva.findAll({
       include: [
-        { model: Sala, attributes: ['Nombre_sala', 'Codigo_sala'] },
-        { model: Modulo, through: { attributes: [] }, attributes: ['ID_Modulo', 'Numero', 'Hora_inicio', 'Hora_final'] },
-        { model: Examen, attributes: ['Nombre_Examen'] },
+        {
+          model: Modulo,
+          through: { attributes: [] },
+          attributes: ['ID_Modulo', 'Numero', 'Hora_inicio', 'Hora_final'],
+        },
+        {
+          model: Examen,
+          attributes: ['Nombre_Examen',  'Cantidad_Modulos'],
+          include: [
+            {
+              model: Asignatura,
+              attributes: ['Nombre_Asignatura'],
+            },
+            {
+              model: Seccion,
+              attributes: ['Nombre_Seccion'],
+              include: [
+                  {
+                    model: Usuario,
+                    through: UsuarioSeccion,
+                    attributes: ['Nombre', 'Rut', 'Email'],
+                    where: { ID_Rol: 1 }, // Filtrar usuarios con rol 1
+                  }
+              ],
+            },
+          ],
+        },
       ],
     });
     return reservas;
@@ -378,5 +619,9 @@ module.exports = {
   crearReservaConModulos,
   actualizarEstadoSala,
   insertarDatosDesdeArchivo,
-
+  insertarAlumnosMasivamente,
+  obtenerAlumnos,
+  insertarDocentesMasivamente,
+  obtenerDocentes,
+  obtenerReservasPorSala,
 };

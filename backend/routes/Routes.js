@@ -42,14 +42,30 @@ router.get('/estados/todo', controller.obtenerEstadosC);
 router.post('/reservas', controller.crearReservaC);
 router.get('/reservas/todo', controller.obtenerReservasC);
 router.get('/reservas/fecha/:fecha', controller.obtenerReservasPorFechaC);
+router.get('/reservas/sala/:ID_Sala', controller.obtenerReservasPorSalaC);
 
 // Exámenes
 router.get('/examenes/todo', controller.obtenerExamenesC);
 
 // Reservas
 router.post('/reservas', controller.crearReservaC);
-module.exports = router;
+
+//Alumnos
+router.get('/alumnos/todo', controller.obtenerAlumnosC);
+
+//Docentes
+router.get('/docentes/todo', controller.obtenerDocentesC);
 
 //CARGA INICIAL
 router.post("/archivo/upload", upload.single("file"), controller.procesarArchivoC);
 router.post("/archivo/confirmar", controller.confirmarDatosC);
+
+//UAURIOS ALUMNOS CARGA MASIVA
+router.post("/alumnos/upload", upload.single("file"), controller.cargarALumnosC);
+router.post("/alumnos/confirmar", controller.confirmarAlumnosC);
+
+//UAURIOS DOCENTES CARGA MASIVA
+router.post("/docentes/upload", upload.single("file"), controller.cargarDocentesC);
+router.post("/docentes/confirmar", controller.confirmarDocentesC);
+
+module.exports = router;

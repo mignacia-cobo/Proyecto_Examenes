@@ -1,4 +1,4 @@
-const xlsx = require("xlsx");
+
 const {
     obtenerModuloPorId,
     actualizarModulo,
@@ -21,9 +21,76 @@ const {
     crearReservaConModulos,
     actualizarEstadoSala,
     insertarDatosDesdeArchivo,
-  
+    insertarAlumnosMasivamente,
+    obtenerAlumnos,
+    insertarDocentesMasivamente,
+    obtenerDocentes,
+    obtenerReservasPorSala,
+
   } = require('../services/Service');
 
+//CARGA ALUMNOS
+const cargarALumnosC = async (req, res) => {
+  try {
+    const workbook = xlsx.readFile(req.file.path);
+    const sheetName = workbook.SheetNames[0];
+    const datos = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
+
+    const datosProcesados = datos.map(row => ({
+      seccion: row["Seccion"],
+      rut: row["Abrev.participante"],
+      nombre: row["Nombre partic."],
+      email: row["Mail"],
+      user: row["user"],
+      pass: row["Abrev.participante"],
+    }));
+
+    res.json(datosProcesados);
+  } catch (error) {
+    console.error("Error al procesar el archivo:", error);
+    res.status(500).json({ error: "Error al procesar el archivo" });
+  }
+};
+const confirmarAlumnosC = async (req, res) => {
+  try {
+    await insertarAlumnosMasivamente(req.body.datos);
+    res.json({ message: "Datos confirmados y cargados correctamente" });
+  } catch (error) {
+    console.error("Error al confirmar los datos:", error);
+    res.status(500).json({ error: "Error al confirmar los datos" });
+  }
+};
+
+//CARGA DOCENTES
+const cargarDocentesC = async (req, res) => {
+  try {
+    const workbook = xlsx.readFile(req.file.path);
+    const sheetName = workbook.SheetNames[0];
+    const datos = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
+
+    const datosProcesados = datos.map(row => ({
+      rut: row["Rut Docente"],
+      nombre: row["Nombre Docente"],
+      email: row["Mail Duoc"],
+      user: row["user"],
+      pass: row["Rut Docente"],
+    }));
+
+    res.json(datosProcesados);
+  } catch (error) {
+    console.error("Error al procesar el archivo:", error);
+    res.status(500).json({ error: "Error al procesar el archivo" });
+  }
+};
+const confirmarDocentesC = async (req, res) => {
+  try {
+    await insertarDocentesMasivamente(req.body.datos);
+    res.json({ message: "Datos confirmados y cargados correctamente" });
+  } catch (error) {
+    console.error("Error al confirmar los datos:", error);
+    res.status(500).json({ error: "Error al confirmar los datos" });
+  }
+};
 
 //CARGA MASIVA INICAL
 const procesarArchivoC = async (req, res) => {
@@ -39,6 +106,7 @@ const procesarArchivoC = async (req, res) => {
       asignatura: row["Nom. Asignatura"],
       nivel: row["Nivel"],
       seccion: row["Sección"],
+      docente: row["Docente según sábana (se puede editar en caso de ser necesario)"],
       inscritos: row["Inscritos (Sábana)"],
       tipoProcesamiento: row["Tipo de Procesamiento"],
       plataformaProcesamiento: row["Plataforma de Procesamiento"],
@@ -95,6 +163,28 @@ const obtenerExamenesC = async (req, res) => {
   }
 };
 
+//Obtener Alumnos
+const obtenerAlumnosC = async (req, res) => {
+  try {
+    const alumnos = await obtenerAlumnos();
+    res.status(200).json(alumnos);
+  } catch (error) {
+    console.error('Error al obtener alumnos:', error);
+    res.status(500).json({ message: 'Error al obtener alumnos' });
+  }
+};
+
+//Obtener Docentes
+const obtenerDocentesC = async (req, res) => {
+  try {
+    const docentes = await obtenerDocentes();
+    res.status(200).json(docentes);
+  } catch (error) {
+    console.error('Error al obtener docentes:', error);
+    res.status(500).json({ message: 'Error al obtener docentes' });
+  }
+};
+
 // Crear reserva
 async function crearReservaC(req, res) {
   try {
@@ -113,6 +203,18 @@ const obtenerReservasPorFechaC = async (req, res) => {
     res.status(200).json(reservas);
   } catch (error) {
     console.error('Error al obtener reservas por fecha:', error.message);
+    res.status(500).json({ message: 'Error al obtener reservas', error: error.message });
+  }
+};
+
+//Obtener reservas por sala
+const obtenerReservasPorSalaC = async (req, res) => {
+  const id =  req.params.ID_Sala;
+  try {
+    const reservas = await obtenerReservasPorSala(id);
+    res.status(200).json(reservas);
+  } catch (error) {
+    console.error('Error al obtener reservas por sala:', error.message);
     res.status(500).json({ message: 'Error al obtener reservas', error: error.message });
   }
 };
@@ -300,4 +402,11 @@ module.exports = {
   actualizarEstadoSalaC,
   procesarArchivoC,
   confirmarDatosC,
+  cargarALumnosC,
+  confirmarAlumnosC,
+  obtenerAlumnosC,
+  cargarDocentesC,
+  confirmarDocentesC,
+  obtenerDocentesC,
+  obtenerReservasPorSalaC,
 };

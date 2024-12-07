@@ -15,6 +15,8 @@ function PlaExamen() {
   const [modulosSeleccionados, setModulosSeleccionados] = useState([]);
   const [fechaSeleccionada, setFechaSeleccionada] = useState(new Date());
   const [examenSeleccionado, setExamenSeleccionado] = useState(null); // Examen actualmente seleccionado
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTermExamen, setSearchTermExamen] = useState ('');
 
   const obtenerFechasDeLaSemana = (fechaBase) => {
     const inicioSemana = startOfWeek(fechaBase, { weekStartsOn: 1 });
@@ -22,6 +24,7 @@ function PlaExamen() {
       .map(dia => ({
         dia: format(dia, 'EEEE', { locale: es }), // Nombres de los días en español
         fecha: format(dia, 'yyyy-MM-dd'),
+        fechaMostrar: format(dia, 'dd/MM/yyyy'),
       }));
   };
   const fechasDeLaSemana = obtenerFechasDeLaSemana(fechaSeleccionada);
@@ -46,6 +49,27 @@ function PlaExamen() {
     cargarDatos();
   }, []);
 
+  //BUESQUEDA DE SALAS
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+  };
+  //BUESQUEDA DE EXAMENES
+  const handleSearchExamen = (e) => {
+    setSearchTermExamen(e.target.value);
+  };
+  
+  //FILTRAR SALAS
+  const filteredSalas = salas?.filter(sala =>
+    sala.Codigo_sala.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    sala.Nombre_sala.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    sala.Capacidad.toString().includes(searchTerm) ||
+    sala.Edificio?.Nombre_Edificio.toString().toLowerCase().includes(searchTerm.toLowerCase()),
+  );
+  //FILTRAR EXAMENES
+  const filteredExamenes = examenes?.filter(examen =>
+    examen.Seccion?.Nombre_Seccion.toLowerCase().includes(searchTermExamen.toLowerCase()) ||
+    examen.Asignatura?.Nombre_Asignatura.toLowerCase().includes(searchTermExamen.toLowerCase()),
+  );
 
   //MANEJAR SELECCION DE EXAMEN
   const manejarSeleccionExamen = (examen) => {
@@ -128,6 +152,7 @@ function PlaExamen() {
             : examen
         )
       );
+      
       // Agregar la nueva reserva al estado con los datos confirmados desde el backend
       const nuevaReserva = response.data; // Asume que el backend devuelve la reserva recién creada
       setReservas((prevReservas) => [...prevReservas, nuevaReserva]);
@@ -174,8 +199,8 @@ function PlaExamen() {
   const renderCabeceraTabla = () => (
     <tr>
       <th colSpan="2">Módulo</th>
-      {fechasDeLaSemana.map(({ dia, fecha }) => (
-        <th key={fecha}>{dia} <br /> {fecha}</th>
+      {fechasDeLaSemana.map(({ dia, fechaMostrar }) => (
+      <th key={fechaMostrar}>{dia} <br /> {fechaMostrar}</th>
       ))}
     </tr>
   );
@@ -184,8 +209,12 @@ function PlaExamen() {
     <>
       {modulos.map((modulo) => (
         <tr key={modulo.ID_Modulo}>
-          <td>{modulo.Numero}</td>
-          <td>{`${modulo.Hora_inicio} - ${modulo.Hora_final}`}</td>
+          <td className="numero-modulo">{modulo.Numero}</td>
+          <td className="horario-modulo">
+            {format(new Date(`1970-01-01T${modulo.Hora_inicio}`), 'HH:mm')}
+            <br />
+            {format(new Date(`1970-01-01T${modulo.Hora_final}`), 'HH:mm')}
+          </td>
           {fechasDeLaSemana.map(({ fecha }) => {
             // Encontrar reserva existente
             const reservaExistente = reservas.find(
@@ -200,10 +229,15 @@ function PlaExamen() {
             );
 
             return (
-              <td key={`${fecha}-${modulo.ID_Modulo}`}>
-                {reservaExistente ? (
-                  <div className="reserva-detalles">
-                    <p>Examen: {reservaExistente.Examen?.Nombre_Examen}</p>
+              <td key={`${fecha}-${modulo.ID_Modulo}`}
+                className={reservaExistente ? 'reservado':'disponible'}>
+                  {reservaExistente? (
+                  <div>
+                    <span className='detalle'>{reservaExistente.Examen?.Nombre_Examen||'N/A'}</span>
+                    <span className='info-reserva'>{reservaExistente.Examen?.Seccion?.Nombre_Seccion || 'N/A'}</span>
+                    <span className='info-reserva'>MÓDULOS: {reservaExistente.Examen?.Cantidad_Modulos || 'N/A'}</span>
+                    <span className='info-reserva'>DOCENTE: {reservaExistente.Examen?.Seccion?.Usuarios?.find(
+                    (usuario) => usuario)?.Nombre || 'N/A'}</span>
                   </div>
                 ) : (
                   <button
@@ -235,27 +269,36 @@ function PlaExamen() {
             />
           </div>
           <h2>Seleccionar Sala</h2>
+          <div className="search-box">
+            <input
+              type='search'
+              placeholder='Buscar...'
+              value={searchTerm}
+              onChange={handleSearch}
+            />
+          </div>
           <div className='search-box' style={{maxHeight:'35%'}}>
             <div className="search-box-table">
+              {filteredSalas.length > 0 && (
               <table>
                 <thead>
                   <tr>
-                    <th>ID</th>
+                    <th>Cód.</th>
                     <th>Nombre</th>
-                    <th>Código</th>
-                    <th>Acción</th>
+                    <th>Edificio</th>
+                    <th></th>
                   </tr>
                 </thead>
                 <tbody>
-                {salas.filter((sala) => sala.ID_Estado === 1) // Usar estado dinámico
+                {filteredSalas.filter((sala) => sala.ID_Estado === 1 || sala.ID_Estado ===2) // Usar estado dinámico
                       .map((sala) => (
                     <tr
                       key={sala.ID_Sala}
                       className={selectedSala?.ID_Sala === sala.ID_Sala ? 'fila-seleccionada' : ''}
                     >
-                      <td>{sala.ID_Sala}</td>
-                      <td>{sala.Nombre_sala}</td>
                       <td>{sala.Codigo_sala}</td>
+                      <td>{sala.Nombre_sala}</td>
+                      <td>{sala.Edificio?.Nombre_Edificio}</td>
                       <td>
                         <FaArrowCircleRight
                           className={`icono ${selectedSala?.ID_Sala === sala.ID_Sala ? 'seleccionado' : ''}`} 
@@ -267,23 +310,33 @@ function PlaExamen() {
                   ))}
                 </tbody>
               </table>
+              )}
             </div>
           </div>
           <h2>Seleccionar Examen</h2>
+          <div className="search-box">
+            <input
+            type='search'
+            placeholder='Buscar...'
+            value={searchTermExamen}
+            onChange={handleSearchExamen}
+            />
+          </div>
           <div className='search-box' style={{maxHeight:'35%'}}>
             <div className="search-box-table">
+              {filteredExamenes.length > 0 && (
               <table>
                 <thead>
                   <tr>
                     <th>Sección</th>
                     <th>Asignatura</th>
-                    <th>Acción</th>
+                    <th></th>
                   </tr>
                 </thead>
                 <tbody>
-                  {examenes.map((examen) => (
+                  {filteredExamenes.map((examen) => (
                     <tr key={examen.ID_Examen}>
-                      <td>{examen.Seccion}</td>
+                      <td>{examen.Seccion?.Nombre_Seccion}</td>
                       <td>{examen.Asignatura?.Nombre_Asignatura}</td>
                       <td>
                         {examen.ID_Estado === 3 ? (
@@ -299,6 +352,7 @@ function PlaExamen() {
                   ))}
                 </tbody>
               </table>
+              )}
             </div>
           </div>
         </div>
@@ -306,14 +360,18 @@ function PlaExamen() {
       <div className='details-section'>
         {selectedSala && (
         <div className='details-section-table'>
-          <div className='details-section-content'>
-            <h3 style={{textAlign:'center'}}>Horario de la sala
-            <br/>{selectedSala?.Codigo_sala} - {selectedSala?.Nombre_sala}
-            </h3>
-          </div>
           <table>
-            <thead>{renderCabeceraTabla()}</thead>
-            <tbody>{renderFilasTabla()}</tbody>
+            <thead>
+              <tr>
+                <th colSpan={8}>
+                  <h2>Sala {selectedSala?.Nombre_sala}</h2>
+                </th>
+              </tr>
+              {renderCabeceraTabla()}
+            </thead>
+            <tbody>
+              {renderFilasTabla()}
+            </tbody>
           </table>
           <div className='details-section-content'>
             <button onClick={enviarReserva}>Confirmar Reserva</button>

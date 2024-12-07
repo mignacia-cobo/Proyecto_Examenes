@@ -1,11 +1,12 @@
 //const { DataTypes } = require('sequelize');
 //const { sequelize } = require('../database');
+
 const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = new Sequelize({
   dialect: 'sqlite',
-  storage: './database.sqlite'
+  storage: './database.sqlite',
+  logging: console.log
 });
-
 
 // Modelos
 
@@ -34,9 +35,9 @@ const Jornada = sequelize.define('Jornada', {
 
 const Usuario = sequelize.define('Usuario', {
   ID_Usuario: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-  Username: { type: DataTypes.STRING, unique: true },
+  Username: { type: DataTypes.STRING}, //unique: true 
   Password: { type: DataTypes.STRING },
-  Nombre: { type: DataTypes.STRING },
+  Nombre: { type: DataTypes.STRING, allowNull: false  },
   Rut: { type: DataTypes.STRING },
   Email: { type: DataTypes.STRING },
   ID_Rol: {type: DataTypes.INTEGER,references: { model: 'Rol', key: 'ID_Rol' }},
@@ -58,11 +59,18 @@ const Asignatura = sequelize.define('Asignatura', {
   ID_Carrera: {type: DataTypes.INTEGER,references: { model: Carrera, key: 'ID_Carrera' }}
 }, { tableName: 'Asignatura', freezeTableName: true, timestamps: false });
 
+const Seccion = sequelize.define('Seccion',{
+  ID_Seccion: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  Nombre_Seccion: { type: DataTypes.STRING, allowNull: false },
+  ID_Asignatura: {type: DataTypes.INTEGER,references: { model: Asignatura, key: 'ID_Asignatura' }},
+  ID_Jornada: {type: DataTypes.INTEGER,references: { model: Jornada, key: 'ID_Jornada' }},
+},{ tableName: 'Seccion', freezeTableName: true, timestamps: false });
+
 const Examen = sequelize.define('Examen', {
   ID_Examen: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   Nombre_Examen: { type: DataTypes.STRING, allowNull: false },
   ID_Asignatura: {type: DataTypes.INTEGER,references: { model: Asignatura, key: 'ID_Asignatura' }},
-  Seccion: { type: DataTypes.STRING },
+  ID_Seccion: {type: DataTypes.INTEGER,references: { model: Seccion, key: 'ID_Seccion' }},
   Inscritos: { type: DataTypes.INTEGER },
   Tipo_Procesamiento: { type: DataTypes.STRING },
   Plataforma_Procesamiento: { type: DataTypes.STRING },
@@ -119,6 +127,11 @@ const UsuarioCarrera = sequelize.define('UsuarioCarrera', {
   ID_Usuario: {type: DataTypes.INTEGER,references: { model: 'Usuario', key: 'ID_Usuario' },},
   ID_Carrera: {type: DataTypes.INTEGER,references: { model: 'Carrera', key: 'ID_Carrera' },},
 }, {tableName: 'UsuarioCarrera',freezeTableName: true,timestamps: false,});
+
+const UsuarioSeccion = sequelize.define('UsuarioSeccion', {
+  ID_Usuario: {type: DataTypes.INTEGER,references: { model: 'Usuario', key: 'ID_Usuario' },},
+  ID_Seccion: {type: DataTypes.INTEGER,references: { model: 'Seccion', key: 'ID_Seccion' },},
+}, {tableName: 'UsuarioSeccion',freezeTableName: true,timestamps: false,}); 
 
 // Relaciones principales
 //reservaModulo
@@ -186,7 +199,26 @@ Estado.hasMany(Usuario, { foreignKey: 'ID_Estado' });
 // Relación Usuario - Carrera (Muchos a Muchos)
 Usuario.belongsToMany(Carrera, { through: UsuarioCarrera, foreignKey: 'ID_Usuario' });
 Carrera.belongsToMany(Usuario, { through: UsuarioCarrera, foreignKey: 'ID_Carrera' });
+//Relacion de SECCION
+//Seccion - Asignatura:
+Seccion.belongsTo(Asignatura, { foreignKey: 'ID_Asignatura' });
+Asignatura.hasMany(Seccion, { foreignKey: 'ID_Asignatura' });
+//Seccion - Examen:
+Seccion.hasMany(Examen, { foreignKey: 'ID_Seccion' });
+Examen.belongsTo(Seccion, { foreignKey: 'ID_Seccion' });
+//Seccion - Usuario:
+Seccion.belongsToMany(Usuario, { through: UsuarioSeccion, foreignKey: 'ID_Seccion' });
+Usuario.belongsToMany(Seccion, { through: UsuarioSeccion, foreignKey: 'ID_Usuario' });
+//Seccion - Jornada:
+Seccion.belongsTo(Jornada, { foreignKey: 'ID_Jornada' });
+Jornada.hasMany(Seccion, { foreignKey: 'ID_Jornada' });
+//UsuarioSeccion - Usuario:
+UsuarioSeccion.belongsTo(Usuario, { foreignKey: 'ID_Usuario' });
+Usuario.hasMany(UsuarioSeccion, { foreignKey: 'ID_Usuario' });
+//UsuarioSeccion - Seccion:
+UsuarioSeccion.belongsTo(Seccion, { foreignKey: 'ID_Seccion' });
+Seccion.hasMany(UsuarioSeccion, { foreignKey: 'ID_Seccion' });
 
 module.exports = {
-  Sede, Edificio, Escuela, Usuario, Carrera, Asignatura, Examen, Sala, Modulo, Reserva, Rol, Estado, ReservaModulo, Jornada, CarreraJornada,
+  sequelize,Sede, Edificio, Escuela, Usuario, Carrera, Asignatura,Seccion, Examen, Sala, Modulo, Reserva, Rol, Estado, ReservaModulo, Jornada, CarreraJornada, UsuarioCarrera, UsuarioSeccion, 
 };

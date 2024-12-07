@@ -3,7 +3,6 @@ import React, { useState, useRef,useEffect } from 'react';
 import './DispSalas.css';
 import JSPDF from 'jspdf';
 import html2canvas from 'html2canvas';
-import * as XLSX from 'xlsx';
 
 function DispSalas() {
   const [searchResult, setSearchResult] = useState([]);
@@ -157,14 +156,7 @@ useEffect(() => {
     });
   };
 
-  const exportTableToExcel = () => {
-    // tener la tabla por su ID
-    let table = document.getElementById("tabla");
-    let workbook = XLSX.utils.table_to_book(table);
-  
-    //archivo en formato XLSX
-    XLSX.writeFile(workbook, "DisponibilidadSalas.xlsx");
-  };
+
 
   //Para tener las salas desde localStorage
   const [salasConfirmadas, setSalasConfirmadas] = useState([]);
@@ -212,7 +204,6 @@ useEffect(() => {
         <div className='details-section-content'>
           {/* botones para exportar a PDF y Excel */}
           <button onClick={generarPDF}>Generar PDF</button>
-          <button onClick={exportTableToExcel}>Exportar a Excel</button>
         </div>
       </div>
     );

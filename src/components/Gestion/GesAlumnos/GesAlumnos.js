@@ -1,146 +1,173 @@
 import React, { useState, useEffect } from 'react';
-import * as XLSX from 'xlsx';
 import './GesAlumnos.css';
+import { IoIosAlbums } from "react-icons/io";
+import { fetchAlumnos,uploadFileAlumnos, confirmUploadAlumnos }  from '../../../services/api';
 
-function GesAlumnos() {
-  
-    const [alumnos, setAlumnos] = useState([]);
-    const [alumnosConfirmados, setAlumnosConfirmados] = useState([]);
-  
-    const handleFileUpload = (e) => {
-      const file = e.target.files[0];
-      const reader = new FileReader();
-  
-      reader.onload = (evt) => {
-        const bstr = evt.target.result;
-        const wb = XLSX.read(bstr, { type: 'binary' });
-        const wsname = wb.SheetNames[0];
-        const ws = wb.Sheets[wsname];
-        const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
-  
-        const alumnosCargados = data.slice(1).map((row) => ({
-          sigla: row[0],
-          idEvento: row[1],
-          seccion: row[2],
-          asignatura: row[3],
-          rut: row[4],
-          nombre: row[5],
-          mail: row[6]
-        }));
-  
-        setAlumnos(alumnosCargados);
-      };
-  
-      reader.readAsBinaryString(file);
+const FileUpload = () => {
+  const [alumnos, setAlumnos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [file, setFile] = useState(null);
+  const [previewData, setPreviewData] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  //OBTENER ALUMNOS
+  useEffect(() => {
+    const loadAlumnos = async () => {
+    try {
+        const data = await fetchAlumnos();
+        setAlumnos(data);
+        setLoading(false);
+    } catch (error) {
+        console.error("Error al cargar los alumnos:", error);
+        setLoading(false);
+    }
     };
-  
-    const confirmarAlumnos = () => {
-        setAlumnosConfirmados(alumnos);
-        localStorage.setItem('alumnosConfirmados', JSON.stringify(alumnos));
-        alert('Alumnos confirmados con éxito.');
-    };
+    loadAlumnos();
+  }, []);
+  if (loading) {
+      return <p>Cargando Alumnos...</p>;
+  }
 
-    useEffect(() => {
-        const alumnosGuardados = localStorage.getItem('alumnosConfirmados');
-        if (alumnosGuardados) {
-            setAlumnosConfirmados(JSON.parse(alumnosGuardados));
-            setAlumnos(JSON.parse(alumnosGuardados));
-        }
-    }, []);
+  //CARGA MASIVA DE ALUMNOS (SOLO SI LA SECCIÓN ESTÁ REGISTRADA SE CREARÁN LOS ALUMNOS)
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
+  };
 
-    const handleRemoveAlumnosConfirmados = () => {
-        localStorage.removeItem('alumnosConfirmados');
-        setAlumnos([]);
-        setAlumnosConfirmados([]);
-    };
+  //CARGA EL ARCHIVO
+  const handleUpload = async () => {
+    if (!file) {
+      alert('Por favor selecciona un archivo primero.');
+      return;
+    }
+    try {
+      const data = await uploadFileAlumnos(file);
+      setPreviewData(data); // Mostrar datos previsualizados
+    } catch (error) {
+      console.error('Error al cargar el archivo:', error);
+    }
+  };
 
+  //CONFIRMA LA CARGA
+  const handleConfirm = async () => {
+    try {
+      await confirmUploadAlumnos(previewData);
+      alert('Datos cargados exitosamente.');
+      setPreviewData([]); // Limpia la previsualización
+      await reloadAlumnos(); // Recarga los datos de la tabla principal
+    } catch (error) {
+      console.error('Error al confirmar la carga:', error);
+    }
+  };
 
+  // FUNCIÓN PARA RECARGAR ALUMNOS
+  const reloadAlumnos = async () => {
+    try {
+      setLoading(true); // Muestra "Cargando" mientras actualiza
+      const data = await fetchAlumnos();
+      setAlumnos(data);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error al recargar los alumnos:', error);
+      setLoading(false);
+    }
+  };
 
-    return (
-      <>
-      <p class="titulo">Gestión de Alumnos</p>
-      <div className='carga-masiva-container'>
-            
-            <button onClick={handleRemoveAlumnosConfirmados} className="btn">
-                <img className="imagen-boton" src="eliminar.png" alt="Eliminar" />
-            </button>
-            <input type="file" onChange={handleFileUpload} accept=".xls, .xlsx" />
-        {alumnos.length > 0 && (
-          <>
+  //BUSCAR ALUMNO
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+  };
+    
+  //FILTRAR ALUMNO
+  const filteredAlumno = alumnos?.filter(alumno =>
+  alumno.Nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  alumno.Rut.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  alumno.Email.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
+
+  return (
+    <>
+      <p className='titulo'>Gestión Alumnos</p>
+      <div className='container-lateral'>
+        <div className='search-section'>
+          <h2>Buscar Alumno</h2>
+          <div className='search-box'>
+            <input
+              type='search'
+              placeholder='Buscar...'
+              value={searchTerm}
+              onChange={handleSearch}
+            />
+          </div>
+          <h2>Subir Archivo</h2>
+          <div className='search-box'>
+            <input type="file" onChange={handleFileChange} />
+            <button onClick={handleUpload}>Subir Archivo</button>
+          </div>
+          <div className='search-box'>
+            {previewData.length > 0 && (
+              <div className="search-box-table">
+                <table style={{overflowY:'auto'}}>
+                  <thead>
+                    <tr>
+                      <th>Rut</th>
+                      <th>Nombre</th>
+                      <th>Email</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  {previewData.map((row, index) => (
+                    <tr key={index}>
+                    <td>{row.rut}</td>
+                    <td>{row.nombre}</td>
+                    <td>{row.email}</td>
+                    {/* Otros datos */}
+                    </tr>
+                  ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+          {previewData.length > 0 && (
+            <div className='details-section-content'>
+              <button onClick={handleConfirm}>Confirmar Carga</button>
+            </div>
+          )}
+        </div>
+      </div>
+      <div className='details-section'>
+        <div className='details-section-table'>
+          {filteredAlumno.length > 0 && (
             <table>
               <thead>
                 <tr>
-                  <th>Sigla</th>
-                  <th>ID Evento</th>
-                  <th>Sección</th>
-                  <th>Asignatura</th>
-                  <th>Rut</th>
+                  <th colSpan={7}><h2>Alumnos Registrados</h2></th>
+                </tr>
+                <tr>
                   <th>Nombre</th>
-                  <th>Mail</th>
+                  <th>Rut</th>
+                  <th>Correo</th>
+                  <th>Usuario</th>
+                  <th>Acciones</th>
                 </tr>
               </thead>
               <tbody>
-                {alumnos.map((alumno, index) => (
-                  <tr key={index}>
-                    <td>{alumno.sigla}</td>
-                    <td>{alumno.idEvento}</td>
-                    <td>{alumno.seccion}</td>
-                    <td>{alumno.asignatura}</td>
-                    <td>{alumno.rut}</td>
-                    <td>{alumno.nombre}</td>
-                    <td>{alumno.mail}</td>
-                  </tr>
-                ))}
+              {filteredAlumno.map((alumno) => (
+                <tr key={alumno.ID_Usuario}>
+                  <td>{alumno.Nombre}</td>
+                  <td>{alumno.Rut}</td>
+                  <td>{alumno.Email}</td>
+                  <td>{alumno.Username}</td>
+                  <td><IoIosAlbums/></td>
+                </tr>
+              ))}
               </tbody>
             </table>
-            <button onClick={confirmarAlumnos}>Confirmar Alumnos</button>
-          </>
-        )}
-  
-  {alumnosConfirmados.length > 0 && (
-                <>
-                    <h2>Alumnos Confirmados</h2>
-                    <table>
-                        <thead>
-                            <tr>
-                            <th>Sigla</th>
-                            <th>ID Evento</th>
-                            <th>Sección</th>
-                            <th>Asignatura</th>
-                            <th>Rut</th>
-                            <th>Nombre</th>
-                            <th>Mail</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {alumnosConfirmados.map((alumno, index) => (
-                                <tr key={index}>
-                                    <td>{alumno.sigla}</td>
-                                    <td>{alumno.idEvento}</td>
-                                    <td>{alumno.seccion}</td>
-                                    <td>{alumno.asignatura}</td>
-                                    <td>{alumno.rut}</td>
-                                    <td>{alumno.nombre}</td>
-                                    <td>{alumno.mail}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </>
-            )}
+          )}
         </div>
-        </>
-    );
-}
+      </div>
+    </>
+  );
+};
 
-export default GesAlumnos;
-
-
-
-
-
-
-
-
-
-            
+export default FileUpload;
