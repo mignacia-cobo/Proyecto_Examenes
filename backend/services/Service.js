@@ -235,7 +235,7 @@ async function crearReservaConModulos(data) {
     // Preparar los datos para insertar en la tabla intermedia ReservaModulo
     const modulosReservados = Modulos.map((modulo) => {
       if (!modulo.ID_Modulo) {
-        throw new Error('Cada módulo debe tener un ID_Modulo.');
+        throw new Error('Cada módulo debe tener un  ID_Modulo ');
       }
       return {
         ID_Reserva: nuevaReserva.ID_Reserva,
