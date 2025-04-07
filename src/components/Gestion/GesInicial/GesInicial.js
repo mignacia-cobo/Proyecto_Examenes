@@ -19,15 +19,19 @@ const FileUpload = () => {
 
     try {
       const data = await uploadFile(file);
+      console.log('Datos cargados:', data);
       setPreviewData(data); // Mostrar datos previsualizados
+      console.log('Datos previsualizados:', data);
     } catch (error) {
       console.error('Error al cargar el archivo:', error);
     }
   };
 
   const handleConfirm = async () => {
+    console.log('Datos a confirmar:', previewData);
     try {
       await confirmUpload(previewData);
+      console.log('Datos confirmados:', previewData);
       alert('Datos cargados exitosamente.');
     } catch (error) {
       console.error('Error al confirmar la carga:', error);

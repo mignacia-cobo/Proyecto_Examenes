@@ -35,7 +35,7 @@ const Jornada = sequelize.define('Jornada', {
 
 const Usuario = sequelize.define('Usuario', {
   ID_Usuario: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-  Username: { type: DataTypes.STRING}, //unique: true 
+  Username: { type: DataTypes.STRING, unique:true}, //unique: true 
   Password: { type: DataTypes.STRING },
   Nombre: { type: DataTypes.STRING, allowNull: false  },
   Rut: { type: DataTypes.STRING },

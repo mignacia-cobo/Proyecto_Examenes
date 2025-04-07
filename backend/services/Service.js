@@ -92,6 +92,10 @@ const insertarDocentesMasivamente = async (datos) => {
 //CARGA MASIVA INICIAL
 // Servicio para procesar y cargar datos del archivo Excel
 const insertarDatosDesdeArchivo = async (datos) => {
+  console.log('Datos recibidos en el servicio:', datos);
+  if (!Array.isArray(datos)) {
+    throw new Error('Los datos no soy un Array.');
+  }
   try {
     for (const row of datos) {
       // Insertar en tabla Escuela
@@ -133,9 +137,9 @@ const insertarDatosDesdeArchivo = async (datos) => {
           ID_Jornada: jornada.ID_Jornada,
         },
       });
+    
 
-      // Insertar en tabla Usuario
-      const [usuario] = await Usuario.findOrCreate({
+      const [usuario, created] = await Usuario.findOrCreate({
         where: { Nombre: row.docente },
         defaults: {
           Username: '', // Opcional, vacío
@@ -148,7 +152,7 @@ const insertarDatosDesdeArchivo = async (datos) => {
           //Telefono: '', // Opcional, vacío
         },
       });
-
+    
       // Insertar en tabla UsuarioSeccion
       await UsuarioSeccion.findOrCreate({
         where: {

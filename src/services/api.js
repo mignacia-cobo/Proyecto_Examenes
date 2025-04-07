@@ -242,13 +242,12 @@ export const uploadFile = async (file) => {
   try {
     const formData = new FormData();
     formData.append('file', file);
-
     const response = await axios.post(`${API_URL}/archivo/upload`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
-
+      console.log('Respuesta del backend:', response.data);
     // Retorna los datos procesados para previsualización
     return response.data;
   } catch (error) {
@@ -260,7 +259,10 @@ export const uploadFile = async (file) => {
 // Confirmar carga de datos procesados
 export const confirmUpload = async (data) => {
   try {
-    const response = await axios.post(`${API_URL}/archivo/confirmar`, { datos: data });
+    const response = await axios.post(`${API_URL}/archivo/confirmar`, data,{
+      headers: {'Content-Type': 'application/json',},
+    });
+    console.log('Respuesta del backend confirmar:', response.data);
     return response.data;
   } catch (error) {
     console.error('Error al confirmar la carga de datos:', error);
@@ -273,14 +275,16 @@ export const uploadFileAlumnos = async (file) => {
   try {
     const formData = new FormData();
     formData.append('file', file);
+    console.log('Datos del archivo:', formData);
 
-    const response = await axios.post(`${API_URL}/alumnos/upload`, formData, {
+    const response = await axios.post(`${API_URL}/alumnos/upload`, formData,{
       headers: {
         'Content-Type': 'multipart/form-data',
       },
       maxContentLength: Infinity, // Sin límite para el contenido
       maxBodyLength: Infinity, // Sin límite para el tamaño del cuerpo 
     });
+    console.log('Respuesta del backend:', response.data);
 
     // Retorna los datos procesados para previsualización
     return response.data;

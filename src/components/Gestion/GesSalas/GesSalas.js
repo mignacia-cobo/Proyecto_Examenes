@@ -169,14 +169,14 @@ function GesSalas() {
 
           <h2>Carga Masiva de Salas</h2>
           <div className='search-box'>
-            <input
-            
-            />
+          
+      
             <button>
               <label htmlFor="file-upload" className="custom-file-upload">
                 Examinar
               </label>
             </button>
+            
             {salas.length > 0 && (
               <>
                 <div class="search-box-table">
@@ -214,7 +214,7 @@ function GesSalas() {
             <table>
               <thead>
                 <tr>
-                  <th colSpan={5}>
+                  <th colSpan={6}>
                     <h2>Salas Registradas</h2>
                   </th>
                 </tr>
@@ -223,7 +223,7 @@ function GesSalas() {
                   <th>Nombre Sala</th>
                   <th>Capacidad</th>
                   <th>Edificio</th>
-                  <th>Editar</th>
+                  <th colSpan={2}>Editar</th>
                 </tr>
               </thead>
               <tbody>
@@ -235,6 +235,8 @@ function GesSalas() {
                     <td>{sala.Edificio.Nombre_Edificio}</td>
                     <td>
                       <FaEdit onClick={() => handleEdit(sala.ID_Sala)} style={{ cursor: 'pointer' }} />
+                    </td>
+                    <td>
                       <FaTrash onClick={() => handleRemoveSalasConfirmadas(sala.ID_Sala)} style={{ cursor: 'pointer' }} />
                     </td>
                   </tr>

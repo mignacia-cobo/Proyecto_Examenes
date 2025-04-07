@@ -141,14 +141,14 @@ const FileUpload = () => {
             <table>
               <thead>
                 <tr>
-                  <th colSpan={7}><h2>Alumnos Registrados</h2></th>
+                  <th colSpan={5}><h2>Alumnos Registrados</h2></th>
                 </tr>
                 <tr>
                   <th>Nombre</th>
                   <th>Rut</th>
                   <th>Correo</th>
                   <th>Usuario</th>
-                  <th>Acciones</th>
+                  <th>-</th>
                 </tr>
               </thead>
               <tbody>

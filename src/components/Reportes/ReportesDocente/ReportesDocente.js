@@ -47,7 +47,7 @@ function ReportesDocente() {
           });
       
           setResultadosAgrupados(Object.values(agrupados));
-        }, [filtroDocente, reservas]);     
+        }, [filtroDocente, reservas, rangosHorarios[0]]);     
     
       return (
         <div className="reportes-container">

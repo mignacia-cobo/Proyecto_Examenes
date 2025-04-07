@@ -1,60 +1,70 @@
 
 .app-header {
   top: 0;
-  width: 100%;
-  justify-content: space-between;
-  align-items: center;
-  z-index: 200;
+  z-index: 1;
   background-color: #ffcc3312;
   color: #092C50;
-  height: 12%;
-  position: absolute;
+  height: 10%;
+  position: relative;
+  font-weight: bolder;
+  min-height: 10vh;
+  width: 100%;
   display: flex;
-  min-height: fit-content;
 }
+
 
 .app-header img {
-  height: 65%;
-  margin-left: 1%;
+  background: #fffcf0;
+  display: block;
+  position: initial;
+  width: 20%;
+  margin-bottom: 8px;
+  margin-top: 8px;
+}
+.app-header h1 {
+  color: #092C50;
+  width: 100%;
+  z-index: 100;
+  overflow: hidden;
+  text-transform: uppercase;
+  font-family: Arial, sans-serif;
+  font-weight: bold;
+  letter-spacing: 1px;
+  display: flex;
+  font-size: clamp(12px,4vw, 28px);
+  margin: 0;
+  text-align: center;
 }
 
-.app-header-text {
-  flex-grow: 1; /* Ocupa el espacio restante */
-  display: flex; /* Usa flexbox */
-  justify-content: space-around; /* Alinea el contenido a la derecha */
-  align-items: center; /* Centra verticalmente el contenido */
-  text-align: center; /* Alinea el texto a la derecha */
-  height: 100%;
-  overflow: hidden;
+.app-header-text { 
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  width: 80%;
+  align-items: center;
+  align-content: center;
 }
 
 /*ORDEN*/
 .main-container {
-  display: flex;
-  height: 88%;
+  height: 90%;
   width: 100%;
-  position: absolute;
-  top: 12%;
-  flex-direction: row;
   background: #ffffff;
   text-transform: uppercase;
-
+  display: inline-flex;
+  height: -moz-available;
 }
 /* Ajustar el margen izquierdo según el estado del menú */
 .main-container.menu-expanded .content-container {
-  left: 15%;
-  position: fixed;
-  width: 85%;
-  height: 100%;
-  display: flex;
+  z-index: 200;
+  overflow: hidden;
+  flex-grow: 1;
 }
 .main-container.menu-collapsed .content-container {
-  position: fixed;
-  left: 4%;
-  display: flex;
-  width: 96%;
-  height: 100%;
-  display: flex;
+  width: 96%;;
+  overflow: hidden;
+  z-index: 200;
+  flex-grow: 1;
 }
 
 
@@ -63,79 +73,89 @@
   font-weight: bold;
   background-color: #092C50;
   color: white;
-  position: fixed;
-  z-index: 100;
-  font-size: 24px;
+  z-index: 1;
+  font-size: clamp(10px,4vh, 36px);
   font-family: Arial, sans-serif;
   text-transform: uppercase;
-  height: 40px;
-  margin-top: 0px;
-  margin-right: 0px;
-  margin-bottom: 0px;
-  margin-left: 0px;
   display: flex;
   border-bottom: 2px solid rgb(213, 170, 0);
+  border-top: 2px solid rgb(213, 170, 0);
   letter-spacing: 1px;
-  line-height: 1.6;
   justify-content: center;
+  min-height: 4px;
+  width: 100%;
+  margin: 0%;
+  padding: 1px;
 }
 .container-lateral{
   width: 25%;
-  height: 85%;
   background-color: #bed2e333;
   box-sizing: border-box;
-  display: flex;
-  margin-top: 40px;
-  overflow-y: auto;
+  overflow-y: hidden;
+  display: inline-block;
+  z-index: 200;
+  overflow-x: hidden;
+  height: 90vh;
 }
 
 .contenido {
   display: flex;
   justify-content: flex-start;
   align-items: flex-start;
-  height: 100%;
   margin-top: 70px;
 }
 
 
 /* Estilos para la sección de búsqueda */
-.search-section {
+search-section {
   width: 100%;
-  height: 98%;
-  background-color: #ffcc3312;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+  height: 100%;
+  display: table;
+
 }
 
 .search-section h2 {
   color: #092c50;
-  font-size: 15px;
+  font-size: clamp(8px, 2%, 16px);
   font-family: Arial, sans-serif;
   font-weight: bold;
   text-align: center;
-  margin: 2px 0;
-  padding: 3px;
-    padding-top: 3px;
-    padding-right: 3px;
-    padding-bottom: 3px;
-    padding-left: 3px;
+  margin: 0px 0;
+  padding-top: 3px;
+  padding-right: 3px;
+  padding-bottom: 3px;
+  padding-left: 3px;
   background-color: #fc3;
-  line-height: 1.4;
+  line-height: 1;
   text-transform: uppercase;
+  position: sticky;
+  z-index: 1;
+  display: block;
+  width: 100%;
 }
 
-
+/*VIEJO
 .search-box {
   margin:1px;
   max-height: 44%;
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+*/
+/*nuevo */
+.search-box {
+  position: relative;
+  background: white;
+  overflow-x: hidden;
+  display: grid;
+  text-align: center;
+  align-content: center;
+  height: 40%;
 
 }
 
+/*VIJO
 .search-box input[type="text"],
 .search-box input[type="number"],
 .search-box input[type="date"],
@@ -147,31 +167,47 @@
   padding: 3px;
   color: #092C50;
   font-family: Arial, sans-serif;
-  font-size: 12px;
   border: 1px solid #007bff;
   margin-bottom: 2px;
   width: 90%;
   margin-right: 5px;
   margin-left: 5px;
+  font-size: clamp(11px, 2%, 14px);
+}
+*/
+/*nuevo */
+.search-box input[type="text"],
+.search-box input[type="number"],
+.search-box input[type="date"],
+.search-box input[type="calendar"],
+.search-box input[type="search"],
+.search-box input[type="file"],
+.search-box select,
+.search-box select:focus {
+  background-color: #ffffff;
+  color: #092C50;
+  font-family: Arial, sans-serif;
+  border: 1px solid #007bff;
+  width: 92%;
+  font-size: clamp(7px, 2%, 14px);
+  height: 19px;
+  margin: 1px;
 }
 
 .search-box button {
-  padding: 4px;
-  margin: 1px;
+  padding: 3px;
   background-color: #007bff;
   color: white;
-  border: none;
+  border: 1px solid #0e5096;
   cursor: pointer;
 }
 
 .search-box table {
-  white-space: normal;
-  font-size: x-small;
-  table-layout: auto;
-  width: 100%;
-  overflow: scroll; /* Habilita el scroll */
-  scrollbar-width: none; /* Para Firefox */
-  -ms-overflow-style: none; /* Para Internet Explorer y Edge heredado */
+  white-space: collapse;
+  scrollbar-width: none;
+  position: relative;
+  word-break: break-word;
+  display: table;
 }
 
 
@@ -179,26 +215,51 @@
   display: none; /* Para navegadores basados en WebKit (Chrome, Safari) */
 }
 
-
+/*Viejo
 .search-box-table {
-  overflow-y:auto; /* Habilita el desplazamiento vertical si es necesario */
-  height: 100%;
+  overflow-y:auto;
+  height: 100%
   width: 100%;
+  overflow-x: hidden;
+}
+*/
+/*nuevo */
+.search-box-table {
+  overflow-y: auto;
+  overflow-x: hidden;
+  width: 100%;
+  display: flex;
+  height: 30vh;
+  
 }
 
+
 .search-box table thead th {
+  /*Viejo
+  font-size: clamp(10px, 2%, 12px);
   border-bottom: 1.5px solid #007bff;
   z-index: 1;
   position: sticky;
-  font-size: small;
   text-align: center;
-  margin: 0px;
-  top:0;
+  background-color: #092C50;
+  padding: 2px;
+  top:0; 
+  */
+  /*nuevo*/
+  font-size: clamp(6px, 2%, 12px);
+  border-bottom: 1.5px solid #007bff;
+  z-index: 1;
+  position: sticky;
+  text-align: center;
+  background-color: #092C50;
+  padding: 2px;
+  top: 0;
+  word-break: initial;
 }
 
 table thead th {
   position: sticky;
-  font-size: 12px;
+  font-size: clamp(7px, 2%, 14px);
   text-align: center;
   top: 0px;
   background-color: #fff; /* Fondo blanco para que destaque */
@@ -209,24 +270,34 @@ table thead th {
 /* Estilos para la tabla de resultados */
 .search-section table {
   border-collapse: collapse;
-  transform: scale(1);/*reducir el porcentaje del tamaño de la tabla*/
-  /*transform: scale(0.96);/*esto es para reducir el porcentaje del tamaño de la tabla*/
+  font-size: clamp(7px, 2%, 14px);
+  word-wrap: break-word;
 }
 
 .search-section table, 
 .search-section table th, 
 .search-section table td {
+  /*Viego
+  border: 1px solid #092C50;
+  background-color: #ffffff;*/
+  /*nuevo*/
   border: 1px solid #092C50;
   background-color: #ffffff;
+  table-layout: auto;
+  overflow-y: hidden;
+  border-collapse: collapse;
+  width: auto;
 }
 
 .search-section table th,
 .search-section table td {
-  text-align:start;
+  text-align: start;
   padding: 0px;
-  font-size: x-small;
+  font-size: clamp(6.5px, 2%, 13px);
   color: #092C50;
 }
+
+
 
 .search-section table th {
   background-color: #092C50;
@@ -234,11 +305,16 @@ table thead th {
 }
 
 .search-section button {
-  padding: 5px;
+  padding: 3px;
   background-color: #007bff;
   color: white;
   border: none;
   cursor: pointer;
+  overflow: auto;
+  font-weight: bolder;
+  font-size: clamp(8px, 2%, 16px);
+  margin: 2px;
+
 }
 
 .search-section button:hover {
@@ -268,8 +344,7 @@ table thead th {
   border: none;
   cursor: none;
   text-align: center;
-  width: 15px;
-  height: 15px;
+
   }
 .imagen-boton {
   width: 15px;
@@ -278,30 +353,31 @@ table thead th {
 
 /* Estilo para la sección de detalles */
 .details-section {
-  width: 80%;
-  height: 100%;
+  width: 75%;
+  height: 90vh;
   background-color: #bed2e333;
   box-sizing: border-box;
-  display: flex; 
-  margin-top:40px;
   overflow-y: auto;
-  margin-bottom: 20%;
+  margin-bottom: 5px;
+  display: inline-flex;
+  position: absolute;
+  width: -moz-available;
+  z-index: 200;
+
 }
 .details-section-content{
-  display: flex;
-  margin: 2px;
-  padding-top: 5px;
+  align-items: center;
+  overflow-x: hidden;
 }
 .details-section-table {
   overflow-y: auto;
-  width: 64.8%;
-  display: flex;
-  position: fixed;
-  height: 80%;
-  max-height: 80%;
   margin-bottom: 5px;
   flex-direction: column;
   align-items: center;
+  overflow-x: hidden;
+  display: block;
+  position: absolute;
+  width: 100%;
 }
 
 .details-section label {
@@ -312,19 +388,26 @@ table thead th {
 
 .details-section select,
 .details-section button {
-  margin-right: 10px;
+  margin-right: 0px;
 }
 
 /* Estilo para la tabla de detalles de sala */
 .details-section table {
-  width: 99%;
-  border-collapse: collapse;
   margin-top: 1px;
   margin-left: 0px;
-  color: #092C50;
-  font-size: small;
-  font-family: Arial, sans-serif;
   margin-bottom: 10px;
+  border-collapse: collapse;
+  color: #092C50;
+  font-family: Arial, sans-serif;
+  font-weight: lighter;
+  position: sticky;
+  box-sizing: border-box;
+  table-layout: auto;
+  word-wrap: break-word;
+  white-space: break-spaces;
+  font-size: clamp(7px, 2%, 14px);
+  width: 100%;
+  
 }
 
 .details-section table,
@@ -349,13 +432,13 @@ table thead th {
 
 /* Botones de cambio de semana */
 .details-section button {
-  padding: 5px 12px;
+  padding: 5px 4px;
   background-color: #007bff;
   color: white;
   border: none;
   cursor: pointer;
+  font-size: clamp(5px 1% 10px);
 }
-
 .details-section button:hover {
   background-color: #0056b3;
 }
@@ -418,16 +501,6 @@ padding: 10px;
 }
 
 
-
-/* Tooltip styling */
-.tooltip content {
-background-color: #1569bd;
-color: rgba(243, 89, 89, 0.598);
-padding: 5px;
-border-radius: 5px;
-font-size: small;
-}
-
 /* Estilo para resaltar los exámenes reservados */
 .table-reservado {
 background-color: #f07979;
@@ -454,6 +527,49 @@ border-color: #555;
 
 .icon{
   color:#007bff;
-  size: 20px;
+  font-size: clamp(14px, 2%, 14px);
 }
 
+/* PARA LA CABECERA DE LA TABLA */
+.search-box-table {
+  position: relative;
+  max-height: 400px; /* Ajusta este valor al tamaño máximo deseado para la tabla */
+  overflow-y: auto; /* Permite scroll solo en el cuerpo, no en el encabezado */
+}
+.D-table {
+  position: relative;
+  max-height: 400px; /* Ajusta este valor al tamaño máximo deseado para la tabla */
+  overflow-y: auto; /* Permite scroll solo en el cuerpo, no en el encabezado */
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead {
+  position: static; /* Fija el encabezado en la parte superior */
+  top: 0; /* Fija el encabezado en la parte superior */
+  z-index: 1; /* Asegura que el encabezado esté por encima del cuerpo */
+  background-color: #f5f5f5; /* Color de fondo del encabezado */
+}
+
+th, td {
+  border: 1px solid #ccc;
+  padding: 1px;
+  text-align: left;
+}
+.details-section button:hover {
+  background-color: #0056b3;
+}
+.details-section .boton-modulo-seleccionado {
+  background-color: #FFCC33; /* Color de fondo para botones de módulos seleccionados */
+  color: white; /* Color del texto */
+}
+
+.details-section .boton-modulo-seleccionado:hover {
+  background-color: #c48b1a; /* Color de fondo para botones de módulos seleccionados */
+  color: white; /* Color del texto */
+}
+
+/*///*/

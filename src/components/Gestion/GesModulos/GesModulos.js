@@ -182,14 +182,14 @@ function GesModulos () {
                         <table>
                             <thead>
                                 <tr>
-                                    <th colSpan={5}><h2>Módulos Registrados</h2></th>
+                                    <th colSpan={6}><h2>Módulos Registrados</h2></th>
                                 </tr>
                                 <tr>
                                     <th>Numero</th>
                                     <th>Hora Inicio</th>
                                     <th>Hora Final</th>
                                     <th>Estado</th>
-                                    <th>Editar</th>
+                                    <th colSpan={2}>Editar</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -201,6 +201,8 @@ function GesModulos () {
                                         <td>{modulo.Estado?.Nombre}</td>
                                         <td>
                                             <FaEdit onClick={() => editarModulo(modulo.ID_Modulo)} style={{ cursor: 'pointer' }} />
+                                        </td>
+                                        <td>
                                             <FaTrash onClick={() => eliminarModulo(modulo.ID_Modulo)} style={{ cursor: 'pointer' }} />
                                         </td>
                                     </tr>

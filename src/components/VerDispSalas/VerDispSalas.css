@@ -3,7 +3,7 @@ td.numero-modulo {
     background-color: #ffffff; /* Blanco */
     font-weight: bold;
     text-align: center;
-    font-size: 16px;
+    font-size: clamp(20px, 2%, 24px);
     color: #000000; /* Negro */
   }
   
@@ -12,18 +12,12 @@ td.numero-modulo {
     background-color: #f6f8ffc1; /* Gris claro */
     font-style: italic;
     text-align: center;
-    font-size: 14px;
     color: #333333; /* Gris oscuro */
-  }
-  h2{
-    margin-top: 5px;
-    margin-bottom: 5px;
-  }
-/* Estilo general para la tabla */
-table {
-    text-align: center;
+    font-size: clamp(14px, 2%, 16px);
+
   }
   
+
   /* Encabezado de la tabla */
   table th {
     background-color: #003366;
@@ -31,12 +25,15 @@ table {
     padding: 10px;
     border: 1px solid #cccccc;
     text-transform: uppercase;
+
   }
 
   /* Celdas */
   table td {
     padding: 10px;
     border: 1px solid #cccccc;
+    word-wrap: none;
+    text-wrap:pretty;
   }
   
   /* Estilo para las celdas con reservas */
@@ -44,39 +41,41 @@ table {
     background-color: #fdd77759;
     color: #333333;
     font-weight:bolder;
-    min-width: 130px;
-    max-width: 140px;
-    overflow: hidden;
-    text-overflow:ellipsis;
     white-space:collapse;
+    font-size: clamp(6px, 2%, 14px);
+    white-space:initial;
+
   }
   
   /* Estilo para las celdas disponibles */
   td.disponible {
-    background-color: #dff0d8;
-    color: #2b532b;
-    font-size: 12px;
-    font-style: italic;
-    min-width: 130px;
-    max-width: 140px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: collapse;
+    background-color: #cbe4ff;
+  color: #007bff;
+  font-style: italic;
+  overflow: hidden;
+  font-size: clamp(11px, 2%, 17px);
+  margin: 1px 1px 1px 1px;
+  font-weight: bold;
   }
   
   /* Información adicional dentro de las celdas */
   td .info-reserva {
-    font-size: 10px;
-    color: #555555;
+    color: hsla(30, 6%, 33%, 0.973);
     text-align: center;
     margin-top: 3px;
     display: block;
+    font-size: clamp(8px, 2%, 14px);
+    word-break: break-all;
+    white-space: break-spaces;  
+    font-weight: lighter;
+
+
   }
   
   /* Estilo para los detalles como nombre de la asignatura o sección */
   table td .detalle {
     font-weight: bold;
-    font-size: 12px;
+    font-size: clamp(10px, 2%, 14px);
   }
   
   /* Hover para las filas */
@@ -88,7 +87,7 @@ table {
   }
   
   table td:hover {
-    background-color: #dfe1ed62;
+    background-color: #dfe1ed18;
   }
   
   

@@ -26,20 +26,21 @@ function VerDisponibilidadSalas() {
         setSalas(salasData);
         setModulos(modulosData);
         setReservas(reservasData);
+        filtrarSalas(salasData);
       } catch (error) {
         console.error('Error al cargar datos:', error);
       }
     };
     cargarDatos();
-  }, []);
+  },[]);
 
   //FUNCIÓN PARA FILTRA LAS SALAS SEGÚN LOS CRITERIOS DE BÚSQUEDA
-  const filtrarSalas = () => {
+  const filtrarSalas = (salasData=salas) => {
     const lowerCaseNombreFiltro = nombreFiltro.toLowerCase();
     const lowerCaseCodigoSalaFiltro = codigoSalaFiltro.toLowerCase();
     const lowerCaseEdificioFiltro = edificioFiltro.toLowerCase();
   
-    const salasFiltradas = salas.filter(sala =>
+    const salasFiltradas = salasData.filter(sala =>
       (codigoSalaFiltro ? sala.Codigo_sala.toLowerCase().includes(lowerCaseCodigoSalaFiltro) : true) &&
       (nombreFiltro ? sala.Nombre_sala.toLowerCase().includes(lowerCaseNombreFiltro) : true) &&
       (edificioFiltro ? sala.Edificio?.Nombre_Edificio.toLowerCase().includes(lowerCaseEdificioFiltro) : true)
@@ -148,6 +149,9 @@ function VerDisponibilidadSalas() {
     }
   };
   
+  useEffect(() => {
+    filtrarSalas();
+  }, [nombreFiltro, codigoSalaFiltro, edificioFiltro]);
 
   return (
     <>
@@ -179,10 +183,11 @@ function VerDisponibilidadSalas() {
               value={codigoSalaFiltro}
               onChange={(e) => setCodigoSalaFiltro(e.target.value)}
             />
-            <button onClick={filtrarSalas}>Buscar</button> {/* Botón de búsqueda */}  
+            <button onClick={()=>filtrarSalas()}>Buscar</button> {/* Botón de búsqueda */}  
           </div>
-          <div className='search-box' style={{maxHeight:'73%'}}>
-            <div className='search-box-table'>
+          <div className='search-box' style={{maxHeight:'53%'}}>
+            <div className='search-box-table' style={{maxHeight: '53%',height:'max-content'}}>
+              {salasFiltradas.length > 0 && (
               <table>
                 <thead>
                   <tr>
@@ -208,6 +213,7 @@ function VerDisponibilidadSalas() {
                   ))}
                 </tbody>
               </table>
+              )}
             </div>
           </div>
         </div>  

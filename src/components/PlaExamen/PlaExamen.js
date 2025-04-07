@@ -277,7 +277,7 @@ function PlaExamen() {
               onChange={handleSearch}
             />
           </div>
-          <div className='search-box' style={{maxHeight:'35%'}}>
+          <div className='search-box' style={{maxHeight:'34%'}}>
             <div className="search-box-table">
               {filteredSalas.length > 0 && (
               <table>
@@ -322,7 +322,7 @@ function PlaExamen() {
             onChange={handleSearchExamen}
             />
           </div>
-          <div className='search-box' style={{maxHeight:'35%'}}>
+          <div className='search-box' style={{maxHeight:'34%'}}>
             <div className="search-box-table">
               {filteredExamenes.length > 0 && (
               <table>

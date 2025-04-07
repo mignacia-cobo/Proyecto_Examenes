@@ -1,7 +1,7 @@
-.icono {
+  svg{
     color: gray; /* Color inicial */
-    font-size: 28px;
     transition: color 0.3s ease; /* Transición suave */
+    position:static;
   }
   
   .icono:hover {
@@ -18,8 +18,26 @@
   .icono.seleccionado {
     color: #007bff !important; /* Forzar el color seleccionado */
   }
-  .icono-reserv {
+  .icon-reserv svg{
     color:#092C50;
-    font-size: 28px;
     transition: color 0.3s ease; /* Transición suave */
+  }
+ td svg{
+    font-size: clamp(18px, 2%, 24px);
+    align-self: center;
+    vertical-align: middle;
+    width: 100%;
+
+  }
+
+  .icon-reserv:hover {
+    color: #fc3; /* Color cuando el cursor pasa encima */
+  }
+  
+  .icon-reserv:active {
+    color: #092C50; /* Color al hacer clic */
+  }
+  
+  .icon-reserv.seleccionado {
+    color: #007bff; /* Color cuando el ícono está seleccionado */
   }

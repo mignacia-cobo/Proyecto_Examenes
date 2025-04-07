@@ -1,60 +1,65 @@
 .slide-container {
-    position: fixed;
-    width: 15%;
-    height: 100vh; 
-    z-index: 100;
-    }
+    font-size: clamp(8px,5vw, 14px);
+    height: initial;
+}
 .main-container.menu-expanded .slide-container{
-    position: fixed;
-    width: 15%;
-    height: 100vh; 
+    position: initial;
+    display: flex;
+    flex-grow: 0;
     z-index: 100;
-    overflow: hidden;
+    width: 15%;
+    height: initial;
 }
 .main-container.menu-collapsed .slide-container{
-    position: fixed;
-    width: 4%;
-    height: 100vh; 
+    position: initial;
+    display: flex;
+    flex-grow: 0;
     z-index: 100;
+    overflow: hidden;
+    width: 4%;
+    height: initial;
+
 }
 
 
 .side-menu {
-    width: 100%; /* Ancho cuando está expandido */
-    height: 100vh;
     transition: width 0.1s ease;
     background-color: #092C50; /* Azul oscuro similar al del logotipo */
     color: #FFCC33; /* Texto en blanco para contrasteeee */
     font-weight: bold;
-    overflow: hidden;
+    font-size: clamp(7px,2%, 14px);
+    position: sticky;
+    width: 100%; /* Ancho cuando está expandido */
     
-}
+  }
 .side-menu .menu-item {
-  width: 100%;
-  height: 10%;
-  transition: width 0.1s ease;
-  background-color: #092C50;
-  color: #FFCC33;
-  font-weight: bold;
-  margin: 15px 0px 5px 0px;
-  position: relative;
-  padding: 0px 0px 0px 0px;
-  text-decoration: none;
-  transition: background-color 0.3s ease;
-  font-size: 15px;
-  display: flex;
-  align-items: first baseline;
-  gap: 8px;
-  flex-direction: column;
+      height: 100%;
+      font-size: clamp(7px,2%, 14px);
+      transition: width 0.1s ease;
+      background-color: #092C50;
+      color: #FFCC33;
+      font-weight: bold;
+      margin: 0px 0px 0px 0px;
+      position: relative;
+      padding: 0px 0px 0px 0px;
+      text-decoration: none;
+      transition: background-color 0.3s ease;
+      display: flex;
+      align-items: first baseline;
+      flex-direction: column;
+      overflow: scroll;
+      scrollbar-width:none;
+      -ms-overflow-style: none;
+      overflow-x: hidden;
 }
     
 .side-menu .submenu {
     width: 100%; /* Ancho cuando está expandido */
-    height: 5%;
     transition: width 0.1s ease;
     background-color: #092C50; /* Azul oscuro similar al del logotipo */
     color: #FFCC33; /* Texto en blanco para contrasteeee */
     font-weight: bold;
+    font-size: clamp(7px,2%, 14px);
 }
 .side-menu ul li a {
     position: relative;
@@ -63,7 +68,6 @@
     color: white; /* color del texto blanco */
     text-decoration: none;
     transition: background-color 0.3s ease;
-    width: 99%;
   }
 
 .side-menu.collapsed {
@@ -71,15 +75,24 @@
 }
 
 
+
 .toggle-menu-btn {
-    width: 100%;
-    background-color: #FFCC33;
-    cursor: pointer;
-    color: #031e39;
-    font-weight: bold;
-    height: 40px;
-    font-size: 32px;
-  }
+  background-color: #FFCC33;
+  cursor: pointer;
+  color: #031e39;
+  position: relative;
+  z-index: 1;
+  font-size: clamp(10px,4vh, 36px);
+  display: flex;
+  border-bottom: #E6B800;
+  letter-spacing: 1px;
+  line-height: 2.0;
+justify-content: center;
+  height: 40px, 40px; 
+  min-height: 4px;
+  border-bottom: 2px solid rgb(213, 170, 0);
+  width: 100%;
+}
 /* Estilo para el botón al pasar el mouse por encima */
 .toggle-menu-btn:hover {
     background-color: #E6B800; /* Un tono más oscuro para que de efecto hover */
@@ -98,31 +111,29 @@
 
 /*ICONOS DEL MENU*/
 .menu-item svg {
-    font-size: 24px; /* Tamaño del ícono */
-    color: rgb(255, 255, 255);
+  font-size: clamp(15px, 2%, 30px);
+  color: rgb(255, 255, 255);
 }
 .submenu svg {
     display: flex;
-    font-size: 24px;
+    font-size: clamp(15px, 2%, 30px);
     color: #fc3;
     position: relative;
     align-self: center;
 }
 ul {
     list-style-type: none; /* Eliminar las viñetas predeterminadas */
-    padding: 2px;
+    padding: 0%
   }
   
 li {
     display: flex;
   align-items: center;
-  font-size: 15px;
-  flex-direction: column;
   margin: 2px 0px 2px 4px;
 }
 
 li svg {
-    font-size: 24px; /* Tamaño del ícono */
+  font-size: clamp(15px, 2%, 30px);
   color: #fc3;
   position: relative;
   align-self: center;
@@ -141,7 +152,36 @@ li svg {
   align-items: center;
   gap: 6px;
   flex-direction: row;
-  font-size: 17px;
+  font-size: clamp(8px,2%, 16px);
   margin-left: 2px;
   padding: 3px;
+  overflow-y: auto;
+  display: flex;
+  align-items: center;
+  margin: 2px 0px 2px 4px;
+  position: relative;
+  display: flex;
+  padding: 3px 3px 5px 7px;
+  text-decoration: none;
+  list-style-type: none;
+  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease;
+  position: relative;
+  display: flex;
+  padding: 3px 3px 5px 7px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  margin: 2px 0px 2px 4px;
+  transition: background-color 0.3s ease;
+  display: flex;
+  align-items: center;
+  margin: 2px 0px 2px 4px;
+
+}
+.search-section
+{
+  width: 100%;
+  height: 100%;
+  display: table;;
 }

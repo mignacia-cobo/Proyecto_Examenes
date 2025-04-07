@@ -70,6 +70,7 @@ function EditarModulo() {
   };
 
   return (
+    // Formulario para editar un módulo    
     <div class="content-container-editar">
       <FaTimes className="exit-icon" onClick={() => navigate('/Gestion/Modulos')} /> {/* Ícono de salida */}
       <form className="editar-sala-form" onSubmit={handleSubmit}>

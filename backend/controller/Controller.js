@@ -28,6 +28,7 @@ const {
     obtenerReservasPorSala,
 
   } = require('../services/Service');
+//const { SourceTextModule } = require('vm');
 
 //CARGA ALUMNOS
 const cargarALumnosC = async (req, res) => {
@@ -92,45 +93,97 @@ const confirmarDocentesC = async (req, res) => {
   }
 };
 
-//CARGA MASIVA INICAL
+//CARGA MASIVA INICIAL
+
+const fs = require('fs');
+const csv = require('csv-parser');
+const stream = require('stream'); 
+
 const procesarArchivoC = async (req, res) => {
+  console.log('Procesando archivo:', req.file);
   try {
-    const workbook = xlsx.readFile(req.file.path);
-    const sheetName = workbook.SheetNames[0];
-    const datos = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
+    // columnas = ['Coordinador(a);Escuela;Carrera Genérica;Jornada;Nivel;Sección;Nom. Asignatura;Tipo de Procesamiento;Plataforma de Procesamiento;Inscritos (Sábana);FECHA DE APLICACIÓN ;DÍA DE APLICACIÓN;HORA INICIO;HORA           FIN;Tiempo Asignado (módulos);Docente según sábana (se puede editar en caso de ser necesario);Sala;Situación Evaluativa'].split(';')
+    const datosProcesados = [];
+    fs.readFile(req.file.path, 'utf8',(err, data) => {
+      if (err) {
+        console.error('Error al leer el archivo:', err);
+        return res.status(500).json({ error: 'Error al leer el archivo' });
+      }
+      // Eliminar BOM
+      if (data.charAt(0) === '\uFEFF'||data.charAt(0) === 0xFEFF ) {
+        data = data.slice(1);
+      }
+      // Procesar el archivo CSV, con un stream de lectura sin bom
+      const bufferStream = new stream.PassThrough();
+      bufferStream.end(Buffer.from(data, 'utf8'));
+      bufferStream
+        .pipe(csv({ separator: ';' }))
+        .on('data', (row) => datosProcesados.push({
+            escuela: row['Escuela'],
+            carrera: row['Carrera Genérica'],
+            jornada: row['Jornada'],
+            nivel: row['Nivel'],
+            seccion: row['Sección'],
+            asignatura: row['Nom. Asignatura'],
+            tipoProcesamiento: row['Tipo de Procesamiento'],
+            plataformaProcesamiento: row['Plataforma de Procesamiento'],
+            inscritos: row['Inscritos (Sábana)'],
+            tiempoAsignado: row['Tiempo Asignado (módulos)'],
+            docente: row['Docente según sábana (se puede editar en caso de ser necesario)'],
+            situacionEvaluativa: row['Situación Evaluativa'],
+          }))
+      .on('end', () => res.json(datosProcesados))
+      .on('error', (error) => {
+        console.error('Error al procesar el archivo:', error);
+        res.status(500).json({ error: 'Error al procesar el archivo' });
+      });
+    });
 
-    const datosProcesados = datos.map(row => ({
-      escuela: row["Escuela"],
-      jornada: row["Jornada"],
-      carrera: row["Carrera Genérica"],
-      asignatura: row["Nom. Asignatura"],
-      nivel: row["Nivel"],
-      seccion: row["Sección"],
-      docente: row["Docente según sábana (se puede editar en caso de ser necesario)"],
-      inscritos: row["Inscritos (Sábana)"],
-      tipoProcesamiento: row["Tipo de Procesamiento"],
-      plataformaProcesamiento: row["Plataforma de Procesamiento"],
-      situacionEvaluativa: row["Situación Evaluativa"],
-      tiempoAsignado: row["Tiempo Asignado (módulos)"],
-    }));
-
-    res.json(datosProcesados);
   } catch (error) {
     console.error("Error al procesar el archivo:", error);
     res.status(500).json({ error: "Error al procesar el archivo" });
   }
 };
 
+
 const confirmarDatosC = async (req, res) => {
+  const datos = req.body;
+  console.log('Datos recibidos en el controlador confirmar:', datos);
   try {
-    await insertarDatosDesdeArchivo(req.body.datos);
+    // Verifica que el cuerpo de la solicitud sea un array
+    if (!Array.isArray(req.body)) {
+      return res.status(400).json({ error: "El cuerpo de la solicitud debe ser un array." });
+    }
+    // Normaliza los datos
+    const datosNormalizados = req.body.map((item, index) => {
+      if (typeof item !== 'object' || item === null) {
+        throw new Error(`El elemento en la posición ${index} no es un objeto válido.`);
+      }
+      // Normaliza campos específicos
+      return {
+        escuela: item.escuela ,
+        carrera: item.carrera ,
+        jornada: item.jornada ,
+        nivel: parseInt(item.nivel, 0) || null, // Convierte a entero
+        seccion: item.seccion ,
+        asignatura: item.asignatura,
+        tipoProcesamiento: item.tipoProcesamiento || null,
+        plataformaProcesamiento: item.plataformaProcesamiento || null,
+        inscritos: parseInt(item.inscritos, 0) || 0, // Convierte a entero
+        tiempoAsignado: parseInt(item.tiempoAsignado, 0) || 0, // Convierte a entero
+        docente: item.docente,
+        situacionEvaluativa: item.situacionEvaluativa || null,
+      };
+    });
+    console.log('Datos notmalizados:', datosNormalizados);
+    // Inserta los datos en la base de datos
+    await insertarDatosDesdeArchivo(datosNormalizados);
     res.json({ message: "Datos confirmados y cargados correctamente" });
   } catch (error) {
     console.error("Error al confirmar los datos:", error);
     res.status(500).json({ error: "Error al confirmar los datos" });
   }
 };
-
 
 //ACTUALIZAR ESTADO DE UNA SALA CUANDO ES SEELCCIONADA
 const actualizarEstadoSalaC = async (req, res) => {
@@ -141,7 +194,6 @@ const actualizarEstadoSalaC = async (req, res) => {
   if (!ID_Sala || ID_Estado === undefined) {
     return res.status(400).json({ message: 'ID_Sala e ID_Estado son requeridos' });
   }
-
   try {
     const salaActualizada = await actualizarEstadoSala(ID_Sala, ID_Estado);
     return res.json({ message: 'Estado de la sala actualizado', sala: salaActualizada });
@@ -150,7 +202,6 @@ const actualizarEstadoSalaC = async (req, res) => {
     res.status(500).json({ message: 'Error al actualizar el estado de la sala' });
   }
 };
-
 
 // Obtener exámenes
 const obtenerExamenesC = async (req, res) => {
@@ -409,4 +460,5 @@ module.exports = {
   confirmarDocentesC,
   obtenerDocentesC,
   obtenerReservasPorSalaC,
+
 };

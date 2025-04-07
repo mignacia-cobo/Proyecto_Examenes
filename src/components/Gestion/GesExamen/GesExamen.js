@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { fetchExamenes }  from '../../../services/api';
 import { IoIosAlbums } from "react-icons/io";
-import './GesExamen.css';
 
 const GesExamen = () => {
     const [examenes, setExamenes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
-    
+    const navigate = useNavigate();
+
     useEffect(() => {
         const loadExamenes = async () => {
         try {
@@ -33,7 +34,7 @@ const GesExamen = () => {
     //FILTRAR EXAMEN
     const filteredExamene = examenes?.filter(examen =>
     examen.Nombre_Examen.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    examen.Seccion.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    examen.Seccion?.Nombre_Seccion.toLowerCase().includes(searchTerm.toLowerCase()) ||
     examen.Estado.Nombre.toLowerCase().includes(searchTerm.toLowerCase()),
     );
     
